@@ -1,0 +1,5 @@
+{
+  "name": "Brand Equity Dashboard (CBBE Model)",
+  "description": "An AI-powered dashboard that analyzes a brand's equity using Keller's Customer-Based Brand Equity (CBBE) model. Enter a brand name to generate a visual dashboard with data-backed scores, analysis, and references from public sources.",
+  "requestFramePermissions": []
+}
