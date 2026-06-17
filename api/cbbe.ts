@@ -17,14 +17,6 @@ type VercelResponse = {
   };
 };
 
-const apiKey = process.env.GEMINI_API_KEY;
-
-if (!apiKey) {
-  throw new Error('GEMINI_API_KEY environment variable not set');
-}
-
-const ai = new GoogleGenAI({ apiKey });
-
 const isGeminiModelOption = (value: unknown): value is GeminiModelOption => {
   return value === 'gemini-2.5-flash' || value === 'gemini-2.5-pro';
 };
@@ -44,6 +36,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const selectedModel = isGeminiModelOption(model) ? model : DEFAULT_MODEL;
 
   try {
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+      console.error('Missing GEMINI_API_KEY environment variable');
+      return res.status(500).json({ error: 'Server misconfiguration' });
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
+
     const response = await ai.models.generateContent({
       model: selectedModel,
       contents: buildCBBEPrompt(brandName.trim()),
