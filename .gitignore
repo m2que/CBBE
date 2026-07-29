@@ -3,3 +3,5 @@ dist/
 .env
 .DS_Store
 vite.config.ts.save
+.vercel
+.env*

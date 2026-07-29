@@ -1,5 +1,6 @@
 
 import React, { useState, useCallback } from 'react';
+import { Pyramid } from 'lucide-react';
 import { AVAILABLE_MODELS, DEFAULT_MODEL, generateCBBEDashboard } from './services/geminiService';
 import type { CBBEData, GeminiModelOption } from './types';
 import BrandInputForm from './components/BrandInputForm';
@@ -51,14 +52,17 @@ const App: React.FC = () => {
                 Customer-Based Brand Equity (CBBE) Model
               </h1>
               <p className="mt-5 max-w-3xl text-base leading-8 text-slate-600 sm:text-lg">
-                Use Keller&apos;s Customer-Based Brand Equity model to evaluate brand strength with clearer score drivers, strategic interpretation, and references that feel more academically useful than ordinary generic AI output.
+                Evaluate brand strength with detailed score drivers, strategic interpretation, and references. The linked industry reports, business news, and academic articles may be used to support reports and business plans.
               </p>
             </div>
             <div className="max-w-sm rounded-[22px] border border-[rgba(15,118,110,0.12)] bg-[linear-gradient(180deg,rgba(255,252,247,0.96),rgba(250,244,235,0.96))] p-5 shadow-[0_16px_40px_rgba(61,41,20,0.08)]">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-800">How students use it</p>
+              <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[rgba(15,118,110,0.08)] text-teal-800">
+                <Pyramid className="h-6 w-6" strokeWidth={1.8} />
+              </div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-800">How to use it</p>
               <p className="mt-3 font-serif text-2xl font-semibold text-slate-900">Reports, case studies, and presentations</p>
               <p className="mt-3 text-sm leading-7 text-slate-600">
-                Start with one brand, see the score logic, then turn the findings into stronger strategic discussion for coursework.
+                Start with one brand, see the score logic, then turn the findings into evidence for reports and business plans.
               </p>
             </div>
           </div>
@@ -90,7 +94,7 @@ const App: React.FC = () => {
         </main>
       </div>
        <footer className="mt-auto pt-8 text-center text-sm text-slate-500">
-        <p>Powered by Google Gemini. Outputs are designed to support evidence-aware academic analysis and should still be reviewed critically.</p>
+        <p>&copy; 2026 MarketLearn. AI-assisted content &mdash; verify before implementation.</p>
         <p className="mt-2">
           Contact:{' '}
           <a href="mailto:marketlearn.online@gmail.com" className="font-medium text-teal-800 underline decoration-[rgba(15,118,110,0.35)] underline-offset-4 transition hover:text-teal-900">

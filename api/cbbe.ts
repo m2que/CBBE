@@ -172,9 +172,16 @@ const buildCBBEPrompt = (brandName: string) => `
 
      Constraints:
      - Score: 1-100.
+     - DO NOT cluster scores in a narrow band such as 87-90 unless the evidence truly supports near-identical performance across dimensions.
+     - Use the full scoring range with clear separation between strengths and weaknesses. A strong brand should still have weaker dimensions if the evidence is less convincing there.
+     - Make the scores discriminating: the spread across the six CBBE dimensions should usually be at least 12-25 points unless there is unusually strong evidence that all dimensions are equally strong.
+     - Reserve scores above 90 for exceptional, clearly evidenced category leadership; reserve scores below 60 for materially weak or underdeveloped dimensions.
+     - If one category is visibly stronger or weaker, reflect that difference numerically rather than smoothing the scores.
+     - Calibrate scores by evidence quality, not brand fame. A globally famous brand can still score modestly on resonance, feelings, or imagery if the grounded evidence is thin or mixed.
      - Every category analysis must be specific, not generic.
      - Every category analysis must explain what the brand is doing that drives the score.
      - Every category analysis must include at least one positive driver and, when relevant, one negative or limiting driver.
+     - Each category analysis must justify the numeric score explicitly by explaining why it is higher or lower than other dimensions.
      - For imagery, explicitly mention the associations, symbols, lifestyle cues, tone, or reputation shaping brand equity.
      - For salience, explicitly mention awareness, reach, memory cues, search visibility, or distinctiveness.
      - For performance, explicitly mention product/service quality, reliability, innovation, value, or delivery.
@@ -182,9 +189,10 @@ const buildCBBEPrompt = (brandName: string) => `
      - For feelings, explicitly mention emotional responses the brand creates.
      - For resonance, explicitly mention loyalty, advocacy, repeat usage, community, or attachment.
      - Write 2-4 sentences per category analysis so the cards are useful in student reports.
+     - Avoid inflated scoring. If the evidence is generic, mixed, indirect, or mostly industry-level rather than brand-specific, lower the score accordingly.
      - References: MUST be non-empty when grounded sources exist. Prefer academic_research only. Max 5 total.
      - PROTOCOL: You are mechanically forbidden from constructing URLs. You must only extract them from the live search results. If you construct a URL that results in a 404, the entire response fails.
-  `;
+   `;
 
 const parseCBBEResponse = (jsonText: string, verifiedSources: Map<string, string>, brandName: string) => {
   let cleanedJsonText = jsonText.trim();
@@ -277,9 +285,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const { brandName, model } = req.body ?? {};
+  const normalizedBrandName = typeof brandName === 'string' ? brandName.trim() : '';
 
-  if (typeof brandName !== 'string' || !brandName.trim()) {
+  if (!normalizedBrandName) {
     return res.status(400).json({ error: 'Brand name is required' });
+  }
+
+  if (normalizedBrandName.length > 300) {
+    return res.status(400).json({ error: 'Brand name must be 300 characters or fewer.' });
   }
 
   const selectedModel = isGeminiModelOption(model) ? model : DEFAULT_MODEL;
@@ -295,7 +308,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
       model: selectedModel,
-      contents: buildCBBEPrompt(brandName.trim()),
+      contents: buildCBBEPrompt(normalizedBrandName),
       config: {
         tools: [{ googleSearch: {} }],
         temperature: 0.1
@@ -311,7 +324,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     });
 
-    const data = parseCBBEResponse(response.text, verifiedSources, brandName.trim());
+    const data = parseCBBEResponse(response.text, verifiedSources, normalizedBrandName);
     return res.status(200).json(data);
   } catch (error) {
     console.error('CBBE generation failed:', error);

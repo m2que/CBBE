@@ -22,7 +22,7 @@ export const DEFAULT_MODEL: GeminiModelOption = 'gemini-2.5-flash';
 
 export const AVAILABLE_MODELS: { value: GeminiModelOption; label: string; description: string }[] = [
   { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash', description: 'Faster default for everyday searches' },
-  { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', description: 'Slower, but stronger reasoning for harder cases' }
+  { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro', description: 'Slower, but stronger reasoning for harder analyses' }
 ];
 
 const normalizeCategory = (category: string): ReferenceCategory => {
@@ -172,9 +172,16 @@ export const buildCBBEPrompt = (brandName: string): string => `
 
      Constraints:
      - Score: 1-100.
+     - DO NOT cluster scores in a narrow band such as 87-90 unless the evidence truly supports near-identical performance across dimensions.
+     - Use the full scoring range with clear separation between strengths and weaknesses. A strong brand should still have weaker dimensions if the evidence is less convincing there.
+     - Make the scores discriminating: the spread across the six CBBE dimensions should usually be at least 12-25 points unless there is unusually strong evidence that all dimensions are equally strong.
+     - Reserve scores above 90 for exceptional, clearly evidenced category leadership; reserve scores below 60 for materially weak or underdeveloped dimensions.
+     - If one category is visibly stronger or weaker, reflect that difference numerically rather than smoothing the scores.
+     - Calibrate scores by evidence quality, not brand fame. A globally famous brand can still score modestly on resonance, feelings, or imagery if the grounded evidence is thin or mixed.
      - Every category analysis must be specific, not generic.
      - Every category analysis must explain what the brand is doing that drives the score.
      - Every category analysis must include at least one positive driver and, when relevant, one negative or limiting driver.
+     - Each category analysis must justify the numeric score explicitly by explaining why it is higher or lower than other dimensions.
      - For imagery, explicitly mention the associations, symbols, lifestyle cues, tone, or reputation shaping brand equity.
      - For salience, explicitly mention awareness, reach, memory cues, search visibility, or distinctiveness.
      - For performance, explicitly mention product/service quality, reliability, innovation, value, or delivery.
@@ -182,9 +189,10 @@ export const buildCBBEPrompt = (brandName: string): string => `
      - For feelings, explicitly mention emotional responses the brand creates.
      - For resonance, explicitly mention loyalty, advocacy, repeat usage, community, or attachment.
      - Write 2-4 sentences per category analysis so the cards are useful in student reports.
+     - Avoid inflated scoring. If the evidence is generic, mixed, indirect, or mostly industry-level rather than brand-specific, lower the score accordingly.
      - References: MUST be non-empty when grounded sources exist. Prefer academic_research only. Max 5 total.
      - PROTOCOL: You are mechanically forbidden from constructing URLs. You must only extract them from the live search results. If you construct a URL that results in a 404, the entire response fails.
-  `;
+   `;
 
 export const parseCBBEResponse = (jsonText: string, verifiedSources: Map<string, string>, brandName: string): CBBEData => {
   let cleanedJsonText = jsonText.trim();

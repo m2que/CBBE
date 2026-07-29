@@ -47,7 +47,7 @@ const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
         <div className="lg:col-span-3 rounded-[24px] border border-[rgba(113,86,56,0.14)] bg-[rgba(255,252,247,0.92)] p-6 shadow-[0_24px_80px_rgba(61,41,20,0.08)]">
-          <h3 className="mb-4 text-center font-serif text-xl font-semibold text-slate-900">Brand Equity Funnel</h3>
+          <h3 className="mb-4 text-center font-serif text-xl font-semibold text-slate-900">Brand Equity Pyramid</h3>
           <BrandEquityFunnel data={data} />
         </div>
         <div className="lg:col-span-2 rounded-[24px] border border-[rgba(113,86,56,0.14)] bg-[rgba(255,252,247,0.92)] p-6 shadow-[0_24px_80px_rgba(61,41,20,0.08)]">
