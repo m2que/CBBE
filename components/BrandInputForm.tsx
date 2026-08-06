@@ -5,20 +5,18 @@ import { SearchIcon } from './icons';
 import type { GeminiModelOption } from '../types';
 
 interface BrandInputFormProps {
-  onSubmit: (brandName: string, model: GeminiModelOption) => void;
+  onAnalyzeClick: (brandName: string, model: GeminiModelOption) => void;
   isLoading: boolean;
   model: GeminiModelOption;
   models: { value: GeminiModelOption; label: string; description: string }[];
   onModelChange: (model: GeminiModelOption) => void;
 }
 
-const BrandInputForm: React.FC<BrandInputFormProps> = ({ onSubmit, isLoading, model, models, onModelChange }) => {
+const BrandInputForm: React.FC<BrandInputFormProps> = ({ onAnalyzeClick, isLoading, model, models, onModelChange }) => {
   const [brandName, setBrandName] = useState('');
   const [inputError, setInputError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleAnalyzeClick = () => {
     const trimmedBrandName = brandName.trim();
 
     if (trimmedBrandName.length > 200) {
@@ -27,11 +25,11 @@ const BrandInputForm: React.FC<BrandInputFormProps> = ({ onSubmit, isLoading, mo
     }
 
     setInputError(null);
-    onSubmit(trimmedBrandName, model);
+    onAnalyzeClick(trimmedBrandName, model);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-8 mx-auto max-w-4xl">
+    <form onSubmit={(e) => e.preventDefault()} className="mb-8 mx-auto max-w-4xl">
       <div className="space-y-4 rounded-[28px] border border-[rgba(245,238,220,0.45)] bg-[linear-gradient(145deg,rgba(4,47,46,0.96),rgba(8,83,75,0.94)_52%,rgba(10,57,54,0.97))] p-4 shadow-[0_30px_90px_rgba(3,32,30,0.42)] transition-all duration-300 focus-within:ring-2 focus-within:ring-[rgba(254,240,138,0.45)] sm:p-5">
         <div className="mb-1 flex items-center gap-3 text-[#f6e7c8]">
           <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[rgba(255,248,225,0.22)] bg-[rgba(255,250,240,0.1)] text-current shadow-[inset_0_1px_0_rgba(255,248,225,0.08)]">
@@ -78,8 +76,9 @@ const BrandInputForm: React.FC<BrandInputFormProps> = ({ onSubmit, isLoading, mo
               </span>
             )}
           </label>
-          <button
-            type="submit"
+            <button
+            type="button"
+            onClick={handleAnalyzeClick}
             disabled={isLoading}
             className="flex items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#f2c66d,#d9a441)] px-6 py-3 font-bold text-[#1f2937] shadow-[0_18px_34px_rgba(89,64,18,0.34)] transition-all duration-300 hover:-translate-y-px hover:bg-[linear-gradient(135deg,#f5d27f,#e0af4e)] focus:outline-none focus:ring-2 focus:ring-[rgba(254,240,138,0.55)] focus:ring-offset-2 focus:ring-offset-[#0a3c39] disabled:cursor-not-allowed disabled:opacity-50"
           >

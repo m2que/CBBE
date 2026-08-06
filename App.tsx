@@ -78,7 +78,7 @@ const App: React.FC = () => {
 
         <main>
           <BrandInputForm
-            onSubmit={handleAnalyzeBrand}
+            onAnalyzeClick={handleAnalyzeBrand}
             isLoading={isLoading}
             model={model}
             models={AVAILABLE_MODELS}
