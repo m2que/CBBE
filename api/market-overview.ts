@@ -112,14 +112,26 @@ const parseMarketOverviewResponse = (jsonText: string, verifiedSources: Map<stri
 
   const groundedEntries = Array.from(verifiedSources.entries()).map(([url, title]) => ({ url, title }));
 
+  const cleanSourceTitle = (title: string, url: string, sourceLabel: string): string => {
+    const trimmed = title.trim();
+
+    if (!trimmed) return `${sourceLabel} report`;
+    if (/^(www\.)?[a-z0-9-]+\.[a-z]{2,}/i.test(trimmed)) return `${sourceLabel} report`;
+    if (/^(pwc|ey|kpmg|deloitte)\.com$/i.test(trimmed)) return `${sourceLabel} report`;
+    if (trimmed.toLowerCase() === url.trim().toLowerCase()) return `${sourceLabel} report`;
+
+    return trimmed;
+  };
+
   const fallbackQuantitativeSources = groundedEntries
     .filter(({ url, title }) => /grand view research/i.test(`${title} ${url}`))
     .slice(0, 2)
     .map(({ url, title }) => ({
-      title: title || url,
+      title: cleanSourceTitle(title || '', url, 'Grand View Research'),
       url,
       sourceType: 'Grand View Research' as const,
-      evidenceUsed: 'Recovered from grounded results as the allowed quantitative market source.'
+      evidenceUsed: 'Allowed quantitative market source.',
+      categoryLabel: 'Grand View Research'
     }));
 
   const fallbackQualitativeSources = groundedEntries
@@ -129,13 +141,14 @@ const parseMarketOverviewResponse = (jsonText: string, verifiedSources: Map<stri
       const combined = `${title} ${url}`.toLowerCase();
       const sourceType = combined.includes('deloitte') ? 'Deloitte' : combined.includes('kpmg') ? 'KPMG' : combined.includes('pwc') ? 'PwC' : 'EY';
 
-      return {
-        title: title || url,
-        url,
-        sourceType: sourceType as 'Deloitte' | 'PwC' | 'EY' | 'KPMG',
-        evidenceUsed: 'Recovered from grounded results as an allowed qualitative trend source.'
-      };
-    });
+        return {
+          title: cleanSourceTitle(title || '', url, sourceType),
+          url,
+          sourceType: sourceType as 'Deloitte' | 'PwC' | 'EY' | 'KPMG',
+          evidenceUsed: 'Allowed qualitative trend source.',
+          categoryLabel: sourceType
+        };
+      });
 
   const cleanSegmentNames = (segments: unknown): string[] => {
     if (!Array.isArray(segments)) return [];
@@ -165,10 +178,11 @@ const parseMarketOverviewResponse = (jsonText: string, verifiedSources: Map<stri
         const title = verifiedSources.get(url) || source.title || '';
         return Boolean(url) && verifiedSources.has(url) && source.sourceType === 'Grand View Research' && /grand view research/i.test(`${title} ${url}`);
       }).map((source: { title: string; url: string; evidenceUsed?: string }) => ({
-        title: verifiedSources.get(source.url) || source.title || source.url,
+        title: cleanSourceTitle(verifiedSources.get(source.url) || source.title || '', source.url, 'Grand View Research'),
         url: source.url,
         sourceType: 'Grand View Research' as const,
-        evidenceUsed: source.evidenceUsed?.trim() || 'Used for market sizing or forecast context.'
+        evidenceUsed: source.evidenceUsed?.trim() || 'Market sizing context.',
+        categoryLabel: 'Grand View Research'
       }))
     : [];
 
@@ -179,15 +193,17 @@ const parseMarketOverviewResponse = (jsonText: string, verifiedSources: Map<stri
         const combined = `${title} ${url}`.toLowerCase();
         return Boolean(url) && verifiedSources.has(url) && ['deloitte', 'pwc', 'ey', 'kpmg'].some((token) => combined.includes(token));
       }).map((source: { title: string; url: string; evidenceUsed?: string }) => {
-        const title = verifiedSources.get(source.url) || source.title || source.url;
-        const combined = `${title} ${source.url}`.toLowerCase();
+        const rawTitle = verifiedSources.get(source.url) || source.title || '';
+        const combined = `${rawTitle} ${source.url}`.toLowerCase();
         const sourceType = combined.includes('deloitte') ? 'Deloitte' : combined.includes('kpmg') ? 'KPMG' : combined.includes('pwc') ? 'PwC' : 'EY';
+        const title = cleanSourceTitle(rawTitle, source.url, sourceType);
 
         return {
           title,
           url: source.url,
           sourceType: sourceType as 'Deloitte' | 'PwC' | 'EY' | 'KPMG',
-          evidenceUsed: source.evidenceUsed?.trim() || 'Used for macroeconomic or consumer behavior context.'
+          evidenceUsed: source.evidenceUsed?.trim() || 'Consumer and market context.',
+          categoryLabel: sourceType
         };
       })
     : [];

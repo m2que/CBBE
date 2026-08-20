@@ -36,7 +36,8 @@ const BrandInputForm: React.FC<BrandInputFormProps> = ({ onAnalyzeClick, isLoadi
           </div>
           <div>
             <p className="brand-microcopy">CBBE Input</p>
-            <p className="brand-copy-sm">Select a brand and get its CBBE scores and dashboard. Each score reflects the strength of a CBBE dimension from 1-100 and the corresponding cards explain how scores are estimated.</p>
+            <p className="brand-copy-sm">Select a brand and get its CBBE scores and dashboard.</p>
+            <p className="brand-copy-sm">Each score reflects the strength of a CBBE dimension from 1-100 and the corresponding cards explain how scores are estimated.</p>
           </div>
         </div>
         <div className="brand-form-grid">

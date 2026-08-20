@@ -29,6 +29,7 @@ export interface MarketOverviewQuantitativeSource {
   url: string;
   sourceType: 'Grand View Research';
   evidenceUsed: string;
+  categoryLabel?: string;
 }
 
 export interface MarketOverviewQualitativeSource {
@@ -36,6 +37,7 @@ export interface MarketOverviewQualitativeSource {
   url: string;
   sourceType: 'Deloitte' | 'PwC' | 'EY' | 'KPMG';
   evidenceUsed: string;
+  categoryLabel?: string;
 }
 
 export interface MarketOverviewQuantitativeSizing {

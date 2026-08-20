@@ -40,7 +40,21 @@ const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data }) => {
   const hasScoreExplanation = categories.some((cat) => cat.data.analysis);
   const quantitative = data.marketOverview?.quantitativeSizing;
   const qualitative = data.marketOverview?.qualitativeTrends;
-  const hasMarketOverview = Boolean(data.marketOverview && quantitative && qualitative);
+  const hasMarketOverview = Boolean(data.marketOverview);
+  const marketOverviewReferences = [
+    ...(quantitative?.sources || []).map((source) => ({
+      title: source.title,
+      url: source.url,
+      label: source.categoryLabel || source.sourceType,
+      note: source.evidenceUsed
+    })),
+    ...(qualitative?.sources || []).map((source) => ({
+      title: source.title,
+      url: source.url,
+      label: source.categoryLabel || source.sourceType,
+      note: source.evidenceUsed
+    }))
+  ].filter((source, index, all) => all.findIndex((item) => item.url === source.url) === index);
 
   return (
     <div className="animate-fade-in space-y-8">
@@ -83,49 +97,6 @@ const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data }) => {
             <p className="brand-copy">{data.summary.strategicRecommendations}</p>
         </div>
       </div>
-
-      {hasReferences && (
-        <div className="brand-card brand-card-pad" id="references">
-            <div className="brand-section-title">
-                <BrandIcon name="icon-cbbe" />
-                <h3 className="brand-heading">Data Sources & References</h3>
-            </div>
-            <div className="brand-stack-16">
-                {referenceCategories.map((catType) => {
-                    const refs = groupedReferences[catType.key];
-                    if (!refs || refs.length === 0) return null;
-
-                    return (
-                        <div key={catType.key} className="brand-stack-12">
-                            <span className="brand-ref-tag" style={{ color: catType.color }}>
-                                {catType.label}
-                            </span>
-                             <ul className="brand-ref-list">
-                                  {refs.map((ref, idx) => (
-                                      <li key={idx} className="brand-ref-item">
-                                          <div className="brand-ref-dot"></div>
-                                          <div className="brand-stack-8">
-                                             <a 
-                                                href={ref.url} 
-                                                target="_blank" 
-                                                rel="noopener noreferrer"
-                                                className="brand-ref-link"
-                                            >
-                                                {ref.title || ref.url}
-                                            </a>
-                                            {ref.relevanceNote && (
-                                              <p className="brand-copy-sm">{ref.relevanceNote}</p>
-                                            )}
-                                          </div>
-                                      </li>
-                                 ))}
-                             </ul>
-                         </div>
-                    );
-                })}
-            </div>
-        </div>
-      )}
 
       {hasMarketOverview && (
         <div className="brand-card brand-card-pad">
@@ -192,25 +163,6 @@ const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data }) => {
               </div>
             </div>
 
-            {((quantitative?.sources.length || 0) + (qualitative?.sources.length || 0)) > 0 && (
-              <div className="brand-subtle-card brand-card-pad">
-                <div className="brand-stack-12">
-                  <p className="brand-microcopy">References</p>
-                  <ul className="brand-ref-list">
-                    {[...(quantitative?.sources || []), ...(qualitative?.sources || [])].map((source) => (
-                      <li key={source.url} className="brand-ref-item">
-                        <div className="brand-ref-dot"></div>
-                        <div className="brand-stack-8">
-                          <a href={source.url} target="_blank" rel="noopener noreferrer" className="brand-ref-link">{source.title}</a>
-                          <p className="brand-copy-sm">{source.evidenceUsed}</p>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-
             {data.marketOverview?.limitations.filter((item) => !/unavailable from the required source set/i.test(item)).length ? (
               <div className="brand-stack-8">
                 <p className="brand-microcopy">Limitations</p>
@@ -225,6 +177,63 @@ const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data }) => {
               </div>
             ) : null}
           </div>
+        </div>
+      )}
+
+      {(hasReferences || marketOverviewReferences.length > 0) && (
+        <div className="brand-card brand-card-pad" id="references">
+            <div className="brand-section-title">
+                <BrandIcon name="icon-cbbe" />
+                <h3 className="brand-heading">Data Sources & References</h3>
+            </div>
+            <div className="brand-stack-16">
+                {referenceCategories.map((catType) => {
+                  const refs = groupedReferences[catType.key];
+                  if (!refs || refs.length === 0) return null;
+
+                  return (
+                    <div key={catType.key} className="brand-stack-12">
+                      <span className="brand-ref-tag" style={{ color: catType.color }}>
+                        {catType.label}
+                      </span>
+                      <ul className="brand-ref-list">
+                        {refs.map((ref, idx) => (
+                          <li key={idx} className="brand-ref-item">
+                            <div className="brand-ref-dot"></div>
+                            <div className="brand-stack-8">
+                              <a href={ref.url} target="_blank" rel="noopener noreferrer" className="brand-ref-link">
+                                {ref.title || ref.url}
+                              </a>
+                              {ref.relevanceNote && (
+                                <p className="brand-copy-sm">{ref.relevanceNote}</p>
+                              )}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })}
+
+                {marketOverviewReferences.length > 0 && (
+                  <div className="brand-stack-12">
+                    <span className="brand-ref-tag" style={{ color: '#87612a' }}>
+                      Market Overview
+                    </span>
+                    <ul className="brand-ref-list">
+                      {marketOverviewReferences.map((ref) => (
+                        <li key={ref.url} className="brand-ref-item">
+                          <div className="brand-ref-dot"></div>
+                          <div className="brand-stack-8">
+                            <p className="brand-copy-sm"><strong>{ref.label}:</strong> <a href={ref.url} target="_blank" rel="noopener noreferrer" className="brand-ref-link">{ref.title}</a></p>
+                            <p className="brand-copy-sm">{ref.note}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+            </div>
         </div>
       )}
 
