@@ -8,7 +8,7 @@ interface BrandIconProps extends React.SVGProps<SVGSVGElement> {
 
 const BrandIcon: React.FC<BrandIconProps> = ({ name, style, ...props }) => (
   <svg viewBox="0 0 24 24" aria-hidden="true" style={{ display: 'block', ...style }} {...props}>
-    <use href={`/assets/marketlearn-icons.svg#${name}`}></use>
+    <use href={`#${name}`}></use>
   </svg>
 );
 
