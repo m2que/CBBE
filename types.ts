@@ -24,6 +24,47 @@ export interface CBBESummary {
   strategicRecommendations: string;
 }
 
+export interface MarketOverviewQuantitativeSource {
+  title: string;
+  url: string;
+  sourceType: 'Grand View Research';
+  evidenceUsed: string;
+}
+
+export interface MarketOverviewQualitativeSource {
+  title: string;
+  url: string;
+  sourceType: 'Deloitte' | 'PwC' | 'EY' | 'KPMG';
+  evidenceUsed: string;
+}
+
+export interface MarketOverviewQuantitativeSizing {
+  summary: string;
+  marketSize?: string;
+  cagr?: string;
+  forecastPeriod?: string;
+  keySegments?: string[];
+  regionalNotes?: string[];
+  sources: MarketOverviewQuantitativeSource[];
+  sourceUnavailable?: boolean;
+}
+
+export interface MarketOverviewQualitativeTrends {
+  summary: string;
+  macroTrends: string[];
+  consumerBehaviorInsights: string[];
+  strategicImplications: string[];
+  sources: MarketOverviewQualitativeSource[];
+  sourceUnavailable?: boolean;
+}
+
+export interface MarketOverview {
+  marketCategory: string;
+  quantitativeSizing: MarketOverviewQuantitativeSizing;
+  qualitativeTrends: MarketOverviewQualitativeTrends;
+  limitations: string[];
+}
+
 export interface CBBEData {
   brandName: string;
   salience: CBBECategory;
@@ -33,6 +74,7 @@ export interface CBBEData {
   feelings: CBBECategory;
   resonance: CBBECategory;
   summary: CBBESummary;
+  marketOverview?: MarketOverview;
   references: Reference[];
 }
 

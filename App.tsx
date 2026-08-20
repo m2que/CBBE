@@ -1,7 +1,7 @@
 
-import React, { useState, useCallback } from 'react';
-import { AVAILABLE_MODELS, DEFAULT_MODEL, generateCBBEDashboard } from './services/geminiService';
-import type { CBBEData, GeminiModelOption } from './types';
+import React, { useState, useCallback, useEffect } from 'react';
+import { AVAILABLE_MODELS, DEFAULT_MODEL, generateCBBEDashboard, generateMarketOverview } from './services/geminiService';
+import type { CBBEData, GeminiModelOption, MarketOverview } from './types';
 import BrandInputForm from './components/BrandInputForm';
 import DashboardDisplay from './components/DashboardDisplay';
 import LoadingIndicator from './components/LoadingIndicator';
@@ -14,6 +14,20 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [model, setModel] = useState<GeminiModelOption>(DEFAULT_MODEL);
+  const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setElapsedSeconds(0);
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setElapsedSeconds((current) => current + 1);
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [isLoading]);
 
   const handleAnalyzeBrand = useCallback(async (brandName: string, selectedModel: GeminiModelOption) => {
     if (!brandName) {
@@ -26,8 +40,15 @@ const App: React.FC = () => {
     setBrand(brandName);
 
     try {
-      const data = await generateCBBEDashboard(brandName, selectedModel);
-      setDashboardData(data);
+      const [data, overview] = await Promise.all([
+        generateCBBEDashboard(brandName, selectedModel),
+        generateMarketOverview(brandName, selectedModel).catch(() => null)
+      ]);
+
+      setDashboardData({
+        ...data,
+        marketOverview: overview || data.marketOverview
+      });
     } catch (err) {
       console.error(err);
       setError('Failed to generate dashboard. The brand may not be well-known enough, or an API error occurred. Please try again.');
@@ -67,11 +88,6 @@ const App: React.FC = () => {
                 <span className="brand-mark">MarketLearn</span>
               </span>
             </a>
-            <nav className="nav" aria-label="Page sections">
-              <a className="brand-nav-link" href="#analyze">Analyze</a>
-              <a className="brand-nav-link" href="#dashboard">Dashboard</a>
-              <a className="brand-nav-link" href="#references">References</a>
-            </nav>
           </div>
         </header>
 
@@ -114,7 +130,7 @@ const App: React.FC = () => {
             onModelChange={setModel}
           />
           
-          {isLoading && <LoadingIndicator />}
+          {isLoading && <LoadingIndicator elapsedSeconds={elapsedSeconds} />}
           {error && <ErrorDisplay message={error} />}
           
           {dashboardData ? (

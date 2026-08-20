@@ -31,12 +31,12 @@ const BrandInputForm: React.FC<BrandInputFormProps> = ({ onAnalyzeClick, isLoadi
     <form onSubmit={(e) => e.preventDefault()} className="brand-panel brand-panel-strong brand-input-shell brand-stack-16">
       <div className="brand-stack-16">
         <div className="brand-section-title">
-          <div className="brand-icon-circle" aria-hidden="true">
+          <div className="brand-icon-circle" aria-hidden="true" style={{ flexShrink: 0 }}>
             <BrandIcon name="icon-cbbe" style={{ width: '32px', height: '32px', display: 'block' }} />
           </div>
           <div>
             <p className="brand-microcopy">CBBE Input</p>
-            <p className="brand-copy-sm">Enter a brand, choose a model, and get the CBBE score.</p>
+            <p className="brand-copy-sm">Select a brand and get its CBBE scores and dashboard. Each score reflects the strength of a CBBE dimension from 1-100 and the corresponding cards explain how scores are estimated.</p>
           </div>
         </div>
         <div className="brand-form-grid">
@@ -87,7 +87,7 @@ const BrandInputForm: React.FC<BrandInputFormProps> = ({ onAnalyzeClick, isLoadi
             className="brand-button brand-button-light"
           >
             <BrandIcon name="icon-marketlearn" className="brand-inline-icon h-5 w-5" />
-            {isLoading ? 'Analyzing...' : 'Get CBBE Score'}
+            {isLoading ? 'Analyzing...' : 'Analyze'}
           </button>
         </div>
         {inputError ? (

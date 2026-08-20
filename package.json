@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:api": "vercel dev --listen 3000",
+    "dev:api": "npx vercel dev --listen 3000",
     "dev:client": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview"

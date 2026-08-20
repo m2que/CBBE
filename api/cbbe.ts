@@ -1,5 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
-import type { GeminiModelOption } from '../types';
+import type { CBBEData, GeminiModelOption, Reference, ReferenceCategory } from '../types';
 
 const VALID_CATEGORIES = [
   'official_brand',
@@ -38,7 +38,7 @@ const normalizeCategory = (category: string) => {
   return 'news_media';
 };
 
-const dedupeReferences = (references: Array<{ url: string }>) => {
+const dedupeReferences = <T extends { url: string }>(references: T[]): T[] => {
   const seen = new Set<string>();
 
   return references.filter((ref) => {
@@ -72,12 +72,12 @@ const ensureAcademicReferences = (
   verifiedSources: Map<string, string>,
   brandName: string
 ) => {
-  const academicRefs = dedupeReferences(
+  const academicRefs = dedupeReferences<Reference>(
     references
       .filter((ref) => ref.category === 'academic_research' || isAcademicSource(ref.url, ref.title))
       .map((ref) => ({
         ...ref,
-        category: 'academic_research',
+        category: 'academic_research' as ReferenceCategory,
         relevanceNote: ref.relevanceNote?.trim() || `Academic source students can cite when explaining the ${brandName} CBBE score.`
       }))
   );
@@ -86,13 +86,13 @@ const ensureAcademicReferences = (
     return academicRefs.slice(0, 5);
   }
 
-  const groundedAcademicRefs = Array.from(verifiedSources.entries())
+  const groundedAcademicRefs: Reference[] = Array.from(verifiedSources.entries())
     .filter(([url, title]) => isAcademicSource(url, title || ''))
     .slice(0, 5)
     .map(([url, title]) => ({
       title: title || url,
       url,
-      category: 'academic_research',
+      category: 'academic_research' as ReferenceCategory,
       relevanceNote: `Recovered from grounded search results as an academic source students can cite for ${brandName}.`
     }));
 
@@ -103,12 +103,13 @@ const ensureAcademicReferences = (
   return references.length > 0
     ? dedupeReferences(references).slice(0, 1).map((ref) => ({
         ...ref,
+        category: normalizeCategory(ref.category),
         relevanceNote: `No academic source was grounded for ${brandName}; this is the strongest available fallback source.`
       }))
     : [];
 };
 
-const buildCBBEPrompt = (brandName: string) => `
+const buildCBBEPrompt = (brandName: string): string => `
     OBJECTIVE: Return the "Top 10%" most authoritative insights using a "Positive Selection" strategy for the brand: "${brandName}".
 
     CRITICAL RULE: QUALITY > SPECIFICITY
@@ -194,7 +195,7 @@ const buildCBBEPrompt = (brandName: string) => `
      - PROTOCOL: You are mechanically forbidden from constructing URLs. You must only extract them from the live search results. If you construct a URL that results in a 404, the entire response fails.
    `;
 
-const parseCBBEResponse = (jsonText: string, verifiedSources: Map<string, string>, brandName: string) => {
+const parseCBBEResponse = (jsonText: string, verifiedSources: Map<string, string>, brandName: string): CBBEData => {
   let cleanedJsonText = jsonText.trim();
 
   if (cleanedJsonText.startsWith('```json')) {
@@ -203,10 +204,10 @@ const parseCBBEResponse = (jsonText: string, verifiedSources: Map<string, string
     cleanedJsonText = cleanedJsonText.substring(3, cleanedJsonText.length - 3).trim();
   }
 
-  const data = JSON.parse(cleanedJsonText);
+  const data: CBBEData = JSON.parse(cleanedJsonText);
 
   if (data.references && Array.isArray(data.references)) {
-    data.references = data.references.map((ref: { title: string; url: string; category: string; relevanceNote?: string }) => {
+    data.references = data.references.map((ref: Reference) => {
       const cleanCategory = normalizeCategory(ref.category);
 
       let finalUrl = ref.url;
