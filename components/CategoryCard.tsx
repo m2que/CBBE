@@ -8,23 +8,23 @@ interface CategoryCardProps {
 }
 
 const levelColors = {
-  1: 'border-teal-700',
-  2: 'border-amber-600',
-  3: 'border-orange-600',
-  4: 'border-slate-700',
+  1: 'text-[#1f4b8f]',
+  2: 'text-[#c39a5b]',
+  3: 'text-[#87612a]',
+  4: 'text-[#183159]',
 };
 
 const levelBgColors = {
-  1: 'bg-teal-700',
-  2: 'bg-amber-600',
-  3: 'bg-orange-600',
-  4: 'bg-slate-700',
+  1: 'bg-[#1f4b8f]',
+  2: 'bg-[#c39a5b]',
+  3: 'bg-[#87612a]',
+  4: 'bg-[#183159]',
 };
 
 const ScoreCircle: React.FC<{ score: number; level: number }> = ({ score, level }) => {
   const circumference = 2 * Math.PI * 28;
   const offset = circumference - (score / 100) * circumference;
-  const colorClass = levelColors[level as keyof typeof levelColors] || 'border-gray-500';
+  const colorClass = levelColors[level as keyof typeof levelColors] || 'text-[#5f6b7a]';
 
   return (
     <div className="relative h-20 w-20">
@@ -39,7 +39,7 @@ const ScoreCircle: React.FC<{ score: number; level: number }> = ({ score, level 
           cy="30"
         />
         <circle
-          className={colorClass.replace('border-', 'text-')}
+          className={colorClass}
           strokeWidth="4"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
@@ -61,7 +61,7 @@ const ScoreCircle: React.FC<{ score: number; level: number }> = ({ score, level 
 
 const CategoryCard: React.FC<CategoryCardProps> = ({ title, level, data }) => {
   return (
-    <div className={`flex h-full flex-col rounded-[22px] border bg-[rgba(255,252,247,0.92)] shadow-[0_20px_60px_rgba(61,41,20,0.08)] transition-all duration-300 ${levelColors[level as keyof typeof levelColors]}`}>
+    <div className="brand-subtle-card flex h-full flex-col">
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
           <span className={`h-3 w-3 rounded-full ${levelBgColors[level as keyof typeof levelColors]}`}></span>
