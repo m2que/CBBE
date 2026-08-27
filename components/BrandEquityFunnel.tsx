@@ -10,7 +10,7 @@ const BrandEquityFunnel: React.FC<BrandEquityFunnelProps> = ({ data }) => {
      {
       name: 'Resonance',
       items: [{ name: 'Resonance', score: data.resonance.score }],
-      color: '#183159',
+      color: 'var(--accent-5)',
       widthClass: 'w-1/2'
     },
     {
@@ -19,7 +19,7 @@ const BrandEquityFunnel: React.FC<BrandEquityFunnelProps> = ({ data }) => {
         { name: 'Judgements', score: data.judgements.score },
         { name: 'Feelings', score: data.feelings.score }
       ],
-      color: '#87612a',
+      color: 'var(--accent-4)',
       widthClass: 'w-2/3'
     },
     {
@@ -28,13 +28,13 @@ const BrandEquityFunnel: React.FC<BrandEquityFunnelProps> = ({ data }) => {
         { name: 'Performance', score: data.performance.score },
         { name: 'Imagery', score: data.imagery.score }
       ],
-      color: '#1f4b8f',
+      color: 'var(--accent-2)',
       widthClass: 'w-5/6'
     },
     {
       name: 'Salience',
       items: [{ name: 'Salience', score: data.salience.score }],
-      color: '#5f6b7a',
+      color: 'var(--accent)',
       widthClass: 'w-full'
     },
   ];
@@ -42,16 +42,19 @@ const BrandEquityFunnel: React.FC<BrandEquityFunnelProps> = ({ data }) => {
   return (
     <div className="flex flex-col items-center space-y-3 py-4">
         {levels.map((level) => (
-            <div key={level.name} className={`${level.widthClass} flex overflow-hidden rounded-md border border-[var(--line)] bg-[var(--surface-strong)] transition-all duration-300 ease-in-out`}>
+            <div key={level.name} className={`${level.widthClass} flex overflow-hidden`} style={{ border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)', background: 'var(--surface-subtle)', transition: 'all 300ms ease-in-out' }}>
                 {level.items.map((item, itemIndex) => (
                     <div
                       key={item.name}
-                      className={`flex-1 p-3 text-center text-white ${level.items.length > 1 && itemIndex === 0 ? 'border-r border-[rgba(255,255,255,0.22)]' : ''}`}
+                      className="flex-1 p-3 text-center text-white"
                       title={`${item.name}: ${item.score}/100`}
-                      style={{ backgroundColor: level.color }}
+                      style={{
+                        backgroundColor: level.color,
+                        borderRight: level.items.length > 1 && itemIndex === 0 ? '1px solid rgba(255,255,255,0.22)' : undefined
+                      }}
                     >
-                          <span className="text-sm font-semibold tracking-tight opacity-90 sm:text-base">{item.name}</span>
-                          <span className="mt-1 block font-serif text-xl font-bold sm:text-3xl">{item.score}</span>
+                          <span style={{ fontSize: '0.95rem', fontWeight: 700, letterSpacing: '-0.02em', opacity: 0.92 }}>{item.name}</span>
+                          <span style={{ display: 'block', marginTop: '4px', fontFamily: '"Inter", system-ui, sans-serif', fontSize: '1.75rem', fontWeight: 800 }}>{item.score}</span>
                      </div>
                 ))}
             </div>

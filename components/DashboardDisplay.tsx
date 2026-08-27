@@ -28,11 +28,11 @@ const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data }) => {
   }, {} as Record<ReferenceCategory, Reference[]>);
 
   const referenceCategories: { key: ReferenceCategory; label: string; color: string }[] = [
-    { key: 'official_brand', label: 'Official Brand', color: 'var(--accent-strong)' },
-    { key: 'government', label: 'Government', color: 'var(--navy-deep)' },
-    { key: 'industry_databases', label: 'Industry Database', color: '#87612a' },
+    { key: 'official_brand', label: 'Official Brand', color: 'var(--accent)' },
+    { key: 'government', label: 'Government', color: 'var(--accent-2)' },
+    { key: 'industry_databases', label: 'Industry Database', color: 'var(--accent-4)' },
     { key: 'news_media', label: 'News Media', color: 'var(--muted)' },
-    { key: 'academic_research', label: 'Academic Research', color: 'var(--accent)' },
+    { key: 'academic_research', label: 'Academic Research', color: 'var(--accent-5)' },
     { key: 'marketing_reports', label: 'Marketing Report', color: 'var(--ink)' },
   ];
 
@@ -59,7 +59,7 @@ const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data }) => {
   return (
     <div className="animate-fade-in space-y-8">
       <h2 className="brand-title" id="dashboard" style={{ fontSize: 'clamp(2.2rem, 4vw, 3.4rem)', textAlign: 'center' }}>
-        CBBE Profile for <span style={{ color: 'var(--accent-strong)' }}>{data.brandName}</span>
+        CBBE Profile for <span style={{ color: 'var(--accent)' }}>{data.brandName}</span>
       </h2>
 
       <div className="brand-section-grid">
@@ -84,14 +84,14 @@ const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data }) => {
       <div className="brand-section-grid">
         <div className="brand-card brand-card-pad">
             <div className="brand-section-title">
-                <BrandIcon name="icon-cbbe" />
+                <BrandIcon name="icon-cbbe" style={{ color: 'var(--accent)' }} />
                 <h3 className="brand-heading">Executive Summary</h3>
             </div>
             <p className="brand-copy">{data.summary.analysis}</p>
         </div>
         <div className="brand-card brand-card-pad">
             <div className="brand-section-title">
-                <BrandIcon name="icon-bpm" style={{ color: 'var(--accent)' }} />
+                <BrandIcon name="icon-bpm" style={{ color: 'var(--accent-2)' }} />
                 <h3 className="brand-heading">Strategic Recommendations</h3>
             </div>
             <p className="brand-copy">{data.summary.strategicRecommendations}</p>
@@ -101,7 +101,7 @@ const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data }) => {
       {hasMarketOverview && (
         <div className="brand-card brand-card-pad">
           <div className="brand-section-title">
-            <BrandIcon name="icon-cbbe" />
+            <BrandIcon name="icon-cbbe" style={{ color: 'var(--accent-4)' }} />
             <h3 className="brand-heading">Market Overview</h3>
           </div>
           <div className="brand-stack-16">
@@ -111,7 +111,7 @@ const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data }) => {
             </div>
 
             <div className="brand-section-grid brand-section-grid-compact">
-              <div className="brand-subtle-card brand-card-pad">
+              <div className="brand-subtle-card brand-card-pad brand-no-top-stripe">
                 <div className="brand-stack-12">
                   <p className="brand-microcopy">Market Size</p>
                   <p className="brand-copy">{quantitative?.sourceUnavailable ? 'No market-size source was found for this query.' : quantitative?.summary}</p>
@@ -144,7 +144,7 @@ const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data }) => {
                 </div>
               </div>
 
-              <div className="brand-subtle-card brand-card-pad">
+              <div className="brand-subtle-card brand-card-pad brand-no-top-stripe">
                 <div className="brand-stack-12">
                   <p className="brand-microcopy">Trends</p>
                   <p className="brand-copy">{qualitative?.sourceUnavailable ? 'No Deloitte, PwC, EY, or KPMG trend source was found for this query.' : qualitative?.summary}</p>
@@ -217,9 +217,9 @@ const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data }) => {
 
                 {marketOverviewReferences.length > 0 && (
                   <div className="brand-stack-12">
-                    <span className="brand-ref-tag" style={{ color: '#87612a' }}>
-                      Market Overview
-                    </span>
+                     <span className="brand-ref-tag" style={{ color: 'var(--accent-4)' }}>
+                       Market Overview
+                     </span>
                     <ul className="brand-ref-list">
                       {marketOverviewReferences.map((ref) => (
                         <li key={ref.url} className="brand-ref-item">

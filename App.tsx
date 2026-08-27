@@ -93,7 +93,10 @@ const App: React.FC = () => {
 
         <section className="brand-card brand-hero">
           <div className="brand-hero-copy">
-            <h1 className="brand-title">Customer-Based Brand Equity (CBBE) Model</h1>
+            <p className="brand-microcopy">CBBE Analyzer</p>
+            <h1 className="brand-title brand-hero-title">
+              Customer-Based Brand Equity
+            </h1>
             <p className="brand-copy">
               Evaluate brand strength with detailed brand equity breakdown and strategic interpretation. The analysis provides links to industry reports, business news, and academic articles to support your reports and business plans.
             </p>

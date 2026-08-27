@@ -8,43 +8,34 @@ interface CategoryCardProps {
 }
 
 const levelColors = {
-  1: 'text-[#1f4b8f]',
-  2: 'text-[#c39a5b]',
-  3: 'text-[#87612a]',
-  4: 'text-[#183159]',
-};
-
-const levelBgColors = {
-  1: 'bg-[#1f4b8f]',
-  2: 'bg-[#c39a5b]',
-  3: 'bg-[#87612a]',
-  4: 'bg-[#183159]',
+  1: 'var(--accent)',
+  2: 'var(--accent-2)',
+  3: 'var(--accent-4)',
+  4: 'var(--accent-5)',
 };
 
 const ScoreCircle: React.FC<{ score: number; level: number }> = ({ score, level }) => {
   const circumference = 2 * Math.PI * 28;
   const offset = circumference - (score / 100) * circumference;
-  const colorClass = levelColors[level as keyof typeof levelColors] || 'text-[#5f6b7a]';
+  const color = levelColors[level as keyof typeof levelColors] || 'var(--muted)';
 
   return (
-    <div className="relative h-20 w-20">
-      <svg className="h-full w-full" viewBox="0 0 60 60">
+    <div style={{ position: 'relative', width: '80px', height: '80px' }}>
+      <svg viewBox="0 0 60 60" style={{ width: '100%', height: '100%' }}>
         <circle
-          className="text-[rgba(113,86,56,0.18)]"
           strokeWidth="4"
-          stroke="currentColor"
+          stroke="rgba(79, 70, 229, 0.14)"
           fill="transparent"
           r="28"
           cx="30"
           cy="30"
         />
         <circle
-          className={colorClass}
           strokeWidth="4"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
-          stroke="currentColor"
+          stroke={color}
           fill="transparent"
           r="28"
           cx="30"
@@ -52,7 +43,18 @@ const ScoreCircle: React.FC<{ score: number; level: number }> = ({ score, level 
           style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
         />
       </svg>
-      <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-serif text-xl font-bold text-slate-900">
+      <span
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
+          fontFamily: '"Inter", system-ui, sans-serif',
+          fontSize: '1.1rem',
+          fontWeight: 800,
+          color: 'var(--ink)'
+        }}
+      >
         {score}
       </span>
     </div>
@@ -60,18 +62,21 @@ const ScoreCircle: React.FC<{ score: number; level: number }> = ({ score, level 
 };
 
 const CategoryCard: React.FC<CategoryCardProps> = ({ title, level, data }) => {
+  const color = levelColors[level as keyof typeof levelColors] || 'var(--accent)';
+
   return (
-    <div className="brand-subtle-card flex h-full flex-col">
-      <div className="flex items-center justify-between p-4">
-        <div className="flex items-center gap-3">
-          <span className={`h-3 w-3 rounded-full ${levelBgColors[level as keyof typeof levelColors]}`}></span>
-          <h3 className="font-serif text-lg font-semibold text-slate-900">{title}</h3>
+    <div className="brand-subtle-card brand-category-card" style={{ display: 'flex', height: '100%', flexDirection: 'column' }}>
+      <div style={{ height: '4px', background: color, flexShrink: 0 }}></div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <span style={{ width: '12px', height: '12px', borderRadius: '999px', background: color }}></span>
+          <h3 className="brand-heading" style={{ fontSize: '1.2rem' }}>{title}</h3>
         </div>
         <ScoreCircle score={data.score} level={level} />
       </div>
-      <div className="flex-grow border-t border-[rgba(113,86,56,0.14)] p-4">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Score drivers</p>
-        <p className="text-sm leading-7 text-slate-600">{data.analysis}</p>
+      <div style={{ flexGrow: 1, borderTop: '1px solid var(--line)', padding: '16px' }}>
+        <p className="brand-microcopy" style={{ marginBottom: '8px' }}>Score drivers</p>
+        <p className="brand-copy-sm">{data.analysis}</p>
       </div>
     </div>
   );

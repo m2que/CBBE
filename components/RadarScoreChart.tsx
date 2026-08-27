@@ -22,30 +22,31 @@ const RadarScoreChart: React.FC<RadarScoreChartProps> = ({ data }) => {
             <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
                 <defs>
                     <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#1f4b8f" stopOpacity={0.34}/>
-                        <stop offset="95%" stopColor="#1f4b8f" stopOpacity={0.1}/>
+                        <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.34}/>
+                        <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.1}/>
                     </linearGradient>
                 </defs>
-                <PolarGrid stroke="rgba(95, 107, 122, 0.24)" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: '#5f6b7a', fontSize: 12 }} />
+                <PolarGrid stroke="rgba(71, 85, 105, 0.24)" />
+                <PolarAngleAxis dataKey="subject" tick={{ fill: '#475569', fontSize: 12, fontFamily: 'Inter, system-ui, sans-serif' }} />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: 'transparent' }} />
                 <Radar 
                   name={data.brandName} 
                   dataKey="score" 
-                  stroke="#1f4b8f" 
+                  stroke="#4f46e5" 
                   fill="url(#colorUv)" 
                   fillOpacity={1}
                 />
                 <Tooltip
                     contentStyle={{
-                        backgroundColor: '#fffaf2',
-                        borderColor: '#d6d2cb',
-                        color: '#1d2430',
+                        backgroundColor: '#ffffff',
+                        borderColor: '#c7d2fe',
+                        color: '#0f172a',
+                        borderRadius: '12px',
                     }}
-                    itemStyle={{ color: '#1d2430' }}
-                    labelStyle={{ color: '#5f6b7a' }}
+                    itemStyle={{ color: '#0f172a' }}
+                    labelStyle={{ color: '#475569' }}
                 />
-                <Legend wrapperStyle={{color: '#5f6b7a'}}/>
+                <Legend wrapperStyle={{ color: '#475569', fontFamily: 'Inter, system-ui, sans-serif' }}/>
             </RadarChart>
         </ResponsiveContainer>
     );
