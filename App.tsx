@@ -16,6 +16,17 @@ const App: React.FC = () => {
   const [model, setModel] = useState<GeminiModelOption>(DEFAULT_MODEL);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
 
+  const handleRunNewAnalysis = useCallback(() => {
+    setDashboardData(null);
+    setError(null);
+    setIsLoading(false);
+    setElapsedSeconds(0);
+
+    window.requestAnimationFrame(() => {
+      document.getElementById('brand-input')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, []);
+
   useEffect(() => {
     if (!isLoading) {
       setElapsedSeconds(0);
@@ -137,7 +148,7 @@ const App: React.FC = () => {
           {error && <ErrorDisplay message={error} />}
           
           {dashboardData ? (
-            <DashboardDisplay data={dashboardData} />
+            <DashboardDisplay data={dashboardData} onRunNewAnalysis={handleRunNewAnalysis} />
           ) : (
              !isLoading && !error && (
               <div className="brand-card brand-state">

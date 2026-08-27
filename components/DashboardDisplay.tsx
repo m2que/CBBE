@@ -8,9 +8,10 @@ import BrandIcon from './BrandIcon';
 
 interface DashboardDisplayProps {
   data: CBBEData;
+  onRunNewAnalysis: () => void;
 }
 
-const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data }) => {
+const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data, onRunNewAnalysis }) => {
   const categories = [
     { name: 'Salience', level: 1, data: data.salience },
     { name: 'Performance', level: 2, data: data.performance },
@@ -82,14 +83,14 @@ const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data }) => {
       </div>
 
       <div className="brand-section-grid">
-        <div className="brand-card brand-card-pad">
+        <div className="brand-card brand-card-pad brand-card-stripe-emerald">
             <div className="brand-section-title">
                 <BrandIcon name="icon-cbbe" style={{ color: 'var(--accent)' }} />
                 <h3 className="brand-heading">Executive Summary</h3>
             </div>
             <p className="brand-copy">{data.summary.analysis}</p>
         </div>
-        <div className="brand-card brand-card-pad">
+        <div className="brand-card brand-card-pad brand-card-stripe-forest">
             <div className="brand-section-title">
                 <BrandIcon name="icon-bpm" style={{ color: 'var(--accent-2)' }} />
                 <h3 className="brand-heading">Strategic Recommendations</h3>
@@ -236,6 +237,13 @@ const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data }) => {
             </div>
         </div>
       )}
+
+      <div className="brand-results-actions">
+        <button type="button" className="brand-button brand-button-run-new" onClick={onRunNewAnalysis}>
+          <BrandIcon name="icon-marketlearn" className="brand-inline-icon" />
+          Run New Analysis
+        </button>
+      </div>
 
     </div>
   );

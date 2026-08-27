@@ -28,7 +28,7 @@ const BrandInputForm: React.FC<BrandInputFormProps> = ({ onAnalyzeClick, isLoadi
   };
 
   return (
-    <form onSubmit={(e) => e.preventDefault()} className="brand-panel brand-panel-strong brand-input-shell brand-stack-16">
+    <form id="brand-input" onSubmit={(e) => e.preventDefault()} className="brand-panel brand-panel-strong brand-input-shell brand-stack-16">
       <div className="brand-stack-16">
         <div className="brand-section-title">
           <div className="brand-icon-circle" aria-hidden="true" style={{ flexShrink: 0 }}>
