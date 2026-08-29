@@ -5,6 +5,7 @@ import CategoryCard from './CategoryCard';
 import BrandEquityFunnel from './BrandEquityFunnel';
 import RadarScoreChart from './RadarScoreChart';
 import BrandIcon from './BrandIcon';
+import ScenarioLab from './scenario-lab/ScenarioLab';
 
 interface DashboardDisplayProps {
   data: CBBEData;
@@ -244,6 +245,8 @@ const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data, onRunNewAnaly
           Run New Analysis
         </button>
       </div>
+
+      <ScenarioLab baselineAnalysis={data} />
 
     </div>
   );

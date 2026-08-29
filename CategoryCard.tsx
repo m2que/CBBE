@@ -1,6 +1,6 @@
 
 import React from 'react';
-import type { CBBECategory } from '../types';
+import type { CBBECategory } from './types';
 
 interface CategoryCardProps {
   title: string;

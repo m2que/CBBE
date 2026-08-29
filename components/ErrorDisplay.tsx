@@ -11,7 +11,7 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ message }) => {
     <div className="brand-alert" role="alert">
       <div className="brand-alert-row">
         <div>
-          <BrandIcon name="icon-bea" />
+          <BrandIcon name="icon-marketlearn" />
         </div>
         <div>
           <p className="brand-alert-title">An error occurred</p>

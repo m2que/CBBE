@@ -1,21 +1,61 @@
 
 import React from 'react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import type { CBBEData } from '../types';
+import type { CBBEData, ScenarioEvaluation, UserPrediction } from '../types';
 
 interface RadarScoreChartProps {
     data: CBBEData;
+    userPrediction?: UserPrediction;
+    scenarioEvaluation?: ScenarioEvaluation;
 }
 
-const RadarScoreChart: React.FC<RadarScoreChartProps> = ({ data }) => {
+const RadarScoreChart: React.FC<RadarScoreChartProps> = ({ data, userPrediction, scenarioEvaluation }) => {
     const chartData = [
-        { subject: 'Salience', score: data.salience.score, fullMark: 100 },
-        { subject: 'Performance', score: data.performance.score, fullMark: 100 },
-        { subject: 'Imagery', score: data.imagery.score, fullMark: 100 },
-        { subject: 'Judgements', score: data.judgements.score, fullMark: 100 },
-        { subject: 'Feelings', score: data.feelings.score, fullMark: 100 },
-        { subject: 'Resonance', score: data.resonance.score, fullMark: 100 },
+        {
+          subject: 'Salience',
+          baseline: data.salience.score,
+          userPrediction: typeof userPrediction?.dimensions.salience.predictedScore === 'number' ? userPrediction.dimensions.salience.predictedScore : undefined,
+          aiEstimate: scenarioEvaluation?.dimensions.salience.score,
+          fullMark: 100
+        },
+        {
+          subject: 'Performance',
+          baseline: data.performance.score,
+          userPrediction: typeof userPrediction?.dimensions.performance.predictedScore === 'number' ? userPrediction.dimensions.performance.predictedScore : undefined,
+          aiEstimate: scenarioEvaluation?.dimensions.performance.score,
+          fullMark: 100
+        },
+        {
+          subject: 'Imagery',
+          baseline: data.imagery.score,
+          userPrediction: typeof userPrediction?.dimensions.imagery.predictedScore === 'number' ? userPrediction.dimensions.imagery.predictedScore : undefined,
+          aiEstimate: scenarioEvaluation?.dimensions.imagery.score,
+          fullMark: 100
+        },
+        {
+          subject: 'Judgements',
+          baseline: data.judgements.score,
+          userPrediction: typeof userPrediction?.dimensions.judgements.predictedScore === 'number' ? userPrediction.dimensions.judgements.predictedScore : undefined,
+          aiEstimate: scenarioEvaluation?.dimensions.judgements.score,
+          fullMark: 100
+        },
+        {
+          subject: 'Feelings',
+          baseline: data.feelings.score,
+          userPrediction: typeof userPrediction?.dimensions.feelings.predictedScore === 'number' ? userPrediction.dimensions.feelings.predictedScore : undefined,
+          aiEstimate: scenarioEvaluation?.dimensions.feelings.score,
+          fullMark: 100
+        },
+        {
+          subject: 'Resonance',
+          baseline: data.resonance.score,
+          userPrediction: typeof userPrediction?.dimensions.resonance.predictedScore === 'number' ? userPrediction.dimensions.resonance.predictedScore : undefined,
+          aiEstimate: scenarioEvaluation?.dimensions.resonance.score,
+          fullMark: 100
+        },
     ];
+
+    const showScenarioSeries = Boolean(userPrediction || scenarioEvaluation);
 
     return (
         <ResponsiveContainer width="100%" height="100%">
@@ -31,11 +71,28 @@ const RadarScoreChart: React.FC<RadarScoreChartProps> = ({ data }) => {
                 <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: 'transparent' }} />
                 <Radar 
                   name={data.brandName} 
-                  dataKey="score" 
+                  dataKey="baseline" 
                   stroke="#4f46e5" 
                   fill="url(#colorUv)" 
                   fillOpacity={1}
                 />
+                {showScenarioSeries && (
+                  <Radar
+                    name="Your prediction"
+                    dataKey="userPrediction"
+                    stroke="#0d9488"
+                    fill="none"
+                    strokeDasharray="6 4"
+                  />
+                )}
+                {scenarioEvaluation && (
+                  <Radar
+                    name="AI estimate"
+                    dataKey="aiEstimate"
+                    stroke="#f59e0b"
+                    fill="none"
+                  />
+                )}
                 <Tooltip
                     contentStyle={{
                         backgroundColor: '#ffffff',
