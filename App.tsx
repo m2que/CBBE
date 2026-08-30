@@ -146,11 +146,19 @@ const App: React.FC = () => {
           )}
         </main>
         <footer className="brand-footer">
+          <a
+            className="brand-footer-button"
+            href="https://forms.cloud.microsoft/r/BdSpx03G9i"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Share feedback
+          </a>
           <p className="brand-footer-copy">
             &copy; 2026 <a href="https://marketlearn.online" className="brand-inline-link">MarketLearn</a>. AI-assisted content &mdash; verify before implementation.
           </p>
           <p className="brand-footer-copy">
-            Contact: <a href="mailto:marketlearn.online@gmail.com" className="brand-inline-link">marketlearn.online@gmail.com</a>
+            <a href="mailto:marketlearn.online@gmail.com" className="brand-inline-link">Email us</a>
           </p>
         </footer>
       </div>

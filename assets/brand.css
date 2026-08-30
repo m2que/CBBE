@@ -681,6 +681,29 @@ code {
   text-align: center;
 }
 
+.brand-footer-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 18px;
+  margin-bottom: 10px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.brand-footer-button:hover {
+  background: var(--accent-2);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
 .brand-footer-copy {
   margin: 0;
   color: var(--muted);
