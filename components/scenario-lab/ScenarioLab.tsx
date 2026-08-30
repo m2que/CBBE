@@ -134,6 +134,8 @@ const ScenarioLab: React.FC<ScenarioLabProps> = ({ baselineAnalysis }) => {
     scenarioInput: defaultScenarioInput
   }));
   const [isGeneratingScenario, setIsGeneratingScenario] = useState<boolean>(false);
+  const [generationStartedAt, setGenerationStartedAt] = useState<number>(0);
+  const [generationElapsedSeconds, setGenerationElapsedSeconds] = useState<number>(0);
   const [isEvaluatingScenario, setIsEvaluatingScenario] = useState<boolean>(false);
   const [evaluationStartedAt, setEvaluationStartedAt] = useState<number>(0);
   const [evaluationElapsedSeconds, setEvaluationElapsedSeconds] = useState<number>(0);
@@ -169,6 +171,21 @@ const ScenarioLab: React.FC<ScenarioLabProps> = ({ baselineAnalysis }) => {
   }, [baselineAnalysis.brandName, session]);
 
   useEffect(() => {
+    if (!isGeneratingScenario || !generationStartedAt) {
+      setGenerationElapsedSeconds(0);
+      return;
+    }
+
+    setGenerationElapsedSeconds(Math.max(1, Math.floor((Date.now() - generationStartedAt) / 1000)));
+
+    const timer = window.setInterval(() => {
+      setGenerationElapsedSeconds(Math.max(1, Math.floor((Date.now() - generationStartedAt) / 1000)));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [generationStartedAt, isGeneratingScenario]);
+
+  useEffect(() => {
     if (!isEvaluatingScenario || !evaluationStartedAt) {
       setEvaluationElapsedSeconds(0);
       return;
@@ -185,6 +202,7 @@ const ScenarioLab: React.FC<ScenarioLabProps> = ({ baselineAnalysis }) => {
 
   const handleCreateScenario = async (scenarioInput: ScenarioInput) => {
     setIsGeneratingScenario(true);
+    setGenerationStartedAt(Date.now());
     setScenarioError(null);
 
     try {
@@ -201,6 +219,7 @@ const ScenarioLab: React.FC<ScenarioLabProps> = ({ baselineAnalysis }) => {
       setScenarioError('We could not create a scenario right now. Please try again.');
     } finally {
       setIsGeneratingScenario(false);
+      setGenerationStartedAt(0);
     }
   };
 
@@ -343,7 +362,7 @@ const ScenarioLab: React.FC<ScenarioLabProps> = ({ baselineAnalysis }) => {
 
       {isGeneratingScenario && (
         <LoadingIndicator
-          elapsedSeconds={0}
+          elapsedSeconds={generationElapsedSeconds}
           title="Creating scenario..."
           description="Generating a brand-specific hypothetical event for your analysis."
           note="This step builds the scenario before you predict the impact."
