@@ -204,7 +204,20 @@ const parseCBBEResponse = (jsonText: string, verifiedSources: Map<string, string
     cleanedJsonText = cleanedJsonText.substring(3, cleanedJsonText.length - 3).trim();
   }
 
-  const data: CBBEData = JSON.parse(cleanedJsonText);
+  const firstBrace = cleanedJsonText.indexOf('{');
+  const lastBrace = cleanedJsonText.lastIndexOf('}');
+  if (firstBrace >= 0 && lastBrace > firstBrace) {
+    cleanedJsonText = cleanedJsonText.slice(firstBrace, lastBrace + 1);
+  }
+
+  let data: CBBEData;
+
+  try {
+    data = JSON.parse(cleanedJsonText);
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : 'Unknown JSON parse error';
+    throw new Error(`CBBE JSON parse failed: ${reason}`);
+  }
 
   if (data.references && Array.isArray(data.references)) {
     data.references = data.references.map((ref: Reference) => {
