@@ -52,7 +52,11 @@ View your app in AI Studio: https://ai.studio/apps/drive/1K8-2FskAChYNN45UOYwgnP
 ## Live Issue Note
 
 - Current live-site issue reported: `Test a scenario` fails with `We could not create a scenario right now. Please try again.`
-- First thing to check in production is whether `GEMINI_API_KEY` is configured for the deployed environment.
-- The `/api/cbbe-scenario` `generate` route depends on the same server-side Gemini key as the main analysis flow.
-- If the key is missing or different in production, Scenario Lab generation will fail even if local development works.
-- After env verification, inspect the deployed function logs for the `/api/cbbe-scenario` generate path before changing prompt or parsing logic.
+- One confirmed production issue was Vercel runtime module resolution for Scenario Lab server helpers.
+- The live route failed with errors like:
+  - `Cannot find module '/var/task/lib/cbbeScenario'`
+  - `Cannot find module '/var/task/api/cbbe-scenario-lib'`
+- To avoid this class of issue, keep `api/cbbe-scenario.ts` self-contained for server-only helper logic instead of relying on sibling helper modules that may not bundle correctly in Vercel runtime.
+- Another live issue was brittle JSON parsing from Gemini output. The app now uses more defensive JSON extraction/parsing for both `/api/cbbe` and Scenario Lab flows.
+- If live behavior breaks again, check Vercel runtime logs first and verify whether the deployed production alias is actually pointing at the latest commit.
+- Local success does not guarantee live success when Vercel runtime bundling differs from local dev resolution.
