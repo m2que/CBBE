@@ -427,6 +427,26 @@ body {
   text-align: left;
 }
 
+.brand-scenario-response-copy,
+.brand-scenario-response-context {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.55;
+}
+
+.brand-scenario-slider {
+  width: 100%;
+  accent-color: var(--scenario-slider-color, var(--accent-4));
+}
+
+.brand-scenario-slider-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
 .brand-scenario-response-option-selected {
   border-color: var(--accent-2);
   background: #f0fdfa;

@@ -18,7 +18,7 @@ import CBBEPredictionForm from './CBBEPredictionForm';
 import StrategyActionsForm from './StrategyActionsForm';
 import ScenarioComparison from './ScenarioComparison';
 
-const STORAGE_VERSION = 'v1';
+const STORAGE_VERSION = 'v2';
 
 const defaultScenarioInput: ScenarioInput = {
   scenarioType: 'product_or_service_failure',
@@ -91,13 +91,25 @@ const loadStoredSession = (baselineAnalysis: CBBEData): ScenarioSession | null =
       : undefined;
 
     const normalizedUserPrediction = parsed.session.userPrediction
-      ? {
-          ...createDefaultPrediction(),
-          ...parsed.session.userPrediction,
-          selectedManagementDecision: typeof parsed.session.userPrediction.selectedManagementDecision === 'string'
-            ? parsed.session.userPrediction.selectedManagementDecision
-            : ''
-        }
+      ? (() => {
+          const mergedPrediction = {
+            ...createDefaultPrediction(),
+            ...parsed.session.userPrediction,
+            selectedManagementDecision: typeof parsed.session.userPrediction.selectedManagementDecision === 'string'
+              ? parsed.session.userPrediction.selectedManagementDecision
+              : ''
+          };
+
+          if (!normalizedGeneratedScenario) return mergedPrediction;
+
+          const availableOptions = normalizedGeneratedScenario.managementOptions || [];
+          const hasValidSelection = availableOptions.includes(mergedPrediction.selectedManagementDecision);
+
+          return {
+            ...mergedPrediction,
+            selectedManagementDecision: hasValidSelection ? mergedPrediction.selectedManagementDecision : ''
+          };
+        })()
       : undefined;
 
     return {

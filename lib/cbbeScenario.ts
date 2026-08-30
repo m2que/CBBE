@@ -131,12 +131,13 @@ const shortenDecisionOption = (value: string): string => {
     .trim();
 
   const sentences = normalized.match(/[^.!?]+[.!?]?/g) || [normalized];
-  const firstSentence = sentences[0]?.trim() || normalized;
-  const words = firstSentence.split(/\s+/).filter(Boolean);
-  const limited = words.slice(0, 18).join(' ').trim().replace(/[,:;\-]+$/u, '');
+  const preferredSentence = sentences
+    .map((sentence) => sentence.trim())
+    .find((sentence) => sentence.split(/\s+/).filter(Boolean).length >= 8)
+    || sentences[0]?.trim()
+    || normalized;
 
-  if (!limited) return '';
-  return /[.!?]$/.test(limited) ? limited : `${limited}.`;
+  return cleanSentenceLimitedText(preferredSentence, 22, 200);
 };
 
 const buildFallbackManagementOptions = (): string[] => {
@@ -252,7 +253,7 @@ export const sanitizeUserPrediction = (value: unknown): UserPrediction | null =>
   const selectedManagementDecision = cleanText(value.selectedManagementDecision, 220);
   const managementResponseDetails = cleanText(value.managementResponseDetails, 400);
 
-  if (!selectedManagementDecision || greatestRisk.length < 20 || greatestOpportunity.length < 20 || likelyStable.length < 20 || overallReasoning.length < 40) {
+  if (!selectedManagementDecision) {
     return null;
   }
 
@@ -508,10 +509,10 @@ Management response details: ${userPrediction.managementResponseDetails || 'No a
 
 User prediction:
 ${DIMENSION_KEYS.map((key) => `${key}: direction=${userPrediction.dimensions[key].direction}, score=${userPrediction.dimensions[key].predictedScore}, reasoning=${userPrediction.dimensions[key].reasoning || 'none'}`).join('\n')}
-Greatest risk: ${userPrediction.greatestRisk}
-Greatest opportunity: ${userPrediction.greatestOpportunity}
-Likely stable: ${userPrediction.likelyStable}
-Overall reasoning: ${userPrediction.overallReasoning}
+Greatest risk: ${userPrediction.greatestRisk || 'Not provided.'}
+Greatest opportunity: ${userPrediction.greatestOpportunity || 'Not provided.'}
+Likely stable: ${userPrediction.likelyStable || 'Not provided.'}
+Overall reasoning: ${userPrediction.overallReasoning || 'Not provided.'}
 
 Proposed strategic actions:
 ${strategyText}`;

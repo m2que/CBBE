@@ -47,6 +47,14 @@ const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
         </div>
 
         <div className="brand-subtle-card brand-card-pad brand-no-top-stripe">
+          <p className="brand-field-label">Management response tested</p>
+          <p className="brand-copy-sm brand-scenario-response-context">{userPrediction.selectedManagementDecision}</p>
+          {userPrediction.managementResponseDetails ? (
+            <p className="brand-copy-sm" style={{ marginTop: '10px' }}>{userPrediction.managementResponseDetails}</p>
+          ) : null}
+        </div>
+
+        <div className="brand-subtle-card brand-card-pad brand-no-top-stripe">
           <p className="brand-field-label">Baseline, prediction, and AI estimate</p>
           <div className="h-80 md:h-96" style={{ marginTop: '12px' }}>
             <RadarScoreChart data={baselineAnalysis} userPrediction={userPrediction} scenarioEvaluation={evaluation} />
@@ -86,7 +94,7 @@ const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                     </div>
                     <div>
                       <p className="brand-field-label">User prediction and reasoning</p>
-                      <p className="brand-copy-sm">{userPrediction.dimensions[key].direction.replaceAll('_', ' ')} to {userPrediction.dimensions[key].predictedScore}. {userPrediction.dimensions[key].reasoning || 'No dimension-specific reasoning added.'}</p>
+                      <p className="brand-copy-sm">{userPrediction.dimensions[key].direction.replaceAll('_', ' ')} to {userPrediction.dimensions[key].predictedScore}.</p>
                     </div>
                     <div>
                       <p className="brand-field-label">AI stress test</p>
@@ -109,6 +117,13 @@ const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
           <CritiqueCard title="Missing considerations" items={evaluation.missingConsiderations} />
           <CritiqueCard title="Recommended revisions" items={evaluation.suggestedStrategyRevisions.map((revision) => revision.text)} />
         </div>
+
+        {userPrediction.overallReasoning ? (
+          <div className="brand-subtle-card brand-card-pad brand-no-top-stripe">
+            <p className="brand-field-label">Your reasoning note</p>
+            <p className="brand-copy-sm">{userPrediction.overallReasoning}</p>
+          </div>
+        ) : null}
 
         <div className="brand-subtle-card brand-card-pad brand-no-top-stripe">
           <p className="brand-field-label">Recommended revisions</p>

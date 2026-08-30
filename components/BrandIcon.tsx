@@ -1,6 +1,6 @@
 import React from 'react';
 
-type BrandIconName = 'icon-marketlearn' | 'icon-cbbe' | 'icon-bpm' | 'icon-bea';
+type BrandIconName = 'icon-marketlearn' | 'icon-cbbe' | 'icon-bpm' | 'icon-bea' | 'icon-anmm';
 
 interface BrandIconProps extends React.SVGProps<SVGSVGElement> {
   name: BrandIconName;

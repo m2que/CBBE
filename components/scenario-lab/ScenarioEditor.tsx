@@ -24,6 +24,8 @@ const ScenarioEditor: React.FC<ScenarioEditorProps> = ({
   onManagementResponseDetailsChange,
   onApply
 }) => {
+  const hasSelectedResponse = selectedManagementDecision.trim().length > 0;
+
   return (
     <div className="brand-subtle-card brand-card-pad brand-scenario-panel" style={{ '--scenario-panel-color': 'var(--accent-2)' } as React.CSSProperties}>
       <p className="brand-microcopy brand-scenario-step-label">Step 2</p>
@@ -84,15 +86,17 @@ const ScenarioEditor: React.FC<ScenarioEditorProps> = ({
                     type="button"
                     className={`brand-scenario-response-option${isSelected ? ' brand-scenario-response-option-selected' : ''}`}
                     role="radio"
-                    aria-checked={isSelected}
-                    onClick={() => onManagementDecisionChange(option)}
-                  >
-                    <span className="brand-scenario-response-indicator" aria-hidden="true"></span>
-                    <span className="brand-copy-sm">{option}</span>
-                  </button>
+                      aria-checked={isSelected}
+                      aria-label={option}
+                      onClick={() => onManagementDecisionChange(option)}
+                    >
+                      <span className="brand-scenario-response-indicator" aria-hidden="true"></span>
+                      <span className="brand-copy-sm brand-scenario-response-copy">{option}</span>
+                    </button>
                 );
               })}
             </div>
+            {!hasSelectedResponse ? <p className="brand-error-text">Select one management response before continuing.</p> : null}
           </label>
           <label className="brand-field brand-scenario-form-span-full">
             <span className="brand-field-label">Response approach details</span>
@@ -110,7 +114,7 @@ const ScenarioEditor: React.FC<ScenarioEditorProps> = ({
       </div>
 
       <div className="brand-scenario-actions-row brand-scenario-actions-row-right">
-        <button type="button" className="brand-button-light brand-scenario-primary-action" onClick={onApply}>Continue to prediction</button>
+        <button type="button" className="brand-button-light brand-scenario-primary-action" onClick={onApply} disabled={!hasSelectedResponse}>Continue to prediction</button>
       </div>
     </div>
   );
