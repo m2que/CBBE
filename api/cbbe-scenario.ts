@@ -13,7 +13,7 @@ import {
   sanitizeScenarioInput,
   sanitizeStrategyActions,
   sanitizeUserPrediction
-} from '../lib/cbbeScenario';
+} from './cbbe-scenario-lib';
 
 type ScenarioRequestBody = {
   action?: unknown;
