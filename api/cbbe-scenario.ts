@@ -53,6 +53,11 @@ const sendValidationError = (res: VercelResponse, error: string) => {
   return res.status(400).json({ error });
 };
 
+const summarizeError = (error: unknown): string => {
+  if (error instanceof Error) return error.message;
+  return String(error);
+};
+
 const generateScenario = async (
   ai: GoogleGenAI,
   brandName: string,
@@ -132,8 +137,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const ai = new GoogleGenAI({ apiKey });
 
     if (action === 'generate') {
-      const scenario = await generateScenario(ai, normalizedBrandName, normalizedBaseline, normalizedScenarioInput, selectedModel);
-      return res.status(200).json({ scenario });
+      try {
+        const scenario = await generateScenario(ai, normalizedBrandName, normalizedBaseline, normalizedScenarioInput, selectedModel);
+        return res.status(200).json({ scenario });
+      } catch (error) {
+        console.error('Scenario generation failed:', {
+          brandName: normalizedBrandName,
+          model: selectedModel,
+          scenarioType: normalizedScenarioInput.scenarioType,
+          severity: normalizedScenarioInput.severity,
+          timeHorizon: normalizedScenarioInput.timeHorizon,
+          error: summarizeError(error)
+        });
+
+        return res.status(500).json({ error: 'Failed to generate scenario.' });
+      }
     }
 
     const normalizedGeneratedScenario = sanitizeGeneratedScenario(generatedScenario, normalizedBrandName);
@@ -163,7 +181,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json({ evaluation });
   } catch (error) {
-    console.error('Scenario lab request failed:', error);
+    console.error('Scenario lab request failed:', summarizeError(error));
     return res.status(500).json({ error: 'Failed to process scenario request.' });
   }
 }

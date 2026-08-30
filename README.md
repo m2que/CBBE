@@ -48,3 +48,11 @@ View your app in AI Studio: https://ai.studio/apps/drive/1K8-2FskAChYNN45UOYwgnP
 - Keep the current `/api/cbbe` and `/api/cbbe-scenario` contracts stable unless a schema-backed extension is explicitly needed.
 - Keep Gemini calls server-side.
 - Prefer small, reviewable changes and document any schema decisions clearly.
+
+## Live Issue Note
+
+- Current live-site issue reported: `Test a scenario` fails with `We could not create a scenario right now. Please try again.`
+- First thing to check in production is whether `GEMINI_API_KEY` is configured for the deployed environment.
+- The `/api/cbbe-scenario` `generate` route depends on the same server-side Gemini key as the main analysis flow.
+- If the key is missing or different in production, Scenario Lab generation will fail even if local development works.
+- After env verification, inspect the deployed function logs for the `/api/cbbe-scenario` generate path before changing prompt or parsing logic.

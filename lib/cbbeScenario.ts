@@ -322,7 +322,7 @@ export const sanitizeBaselineAnalysis = (value: unknown): CBBEData | null => {
   };
 };
 
-const parseJsonText = (jsonText: string): unknown => {
+const extractJsonObject = (jsonText: string): string => {
   let cleanedJsonText = jsonText.trim();
 
   if (cleanedJsonText.startsWith('```json')) {
@@ -331,12 +331,38 @@ const parseJsonText = (jsonText: string): unknown => {
     cleanedJsonText = cleanedJsonText.substring(3, cleanedJsonText.length - 3).trim();
   }
 
-  return JSON.parse(cleanedJsonText);
+  const firstBrace = cleanedJsonText.indexOf('{');
+  const lastBrace = cleanedJsonText.lastIndexOf('}');
+
+  if (firstBrace >= 0 && lastBrace > firstBrace) {
+    return cleanedJsonText.slice(firstBrace, lastBrace + 1);
+  }
+
+  return cleanedJsonText;
+};
+
+const parseJsonText = (jsonText: string): unknown => {
+  const cleanedJsonText = extractJsonObject(jsonText);
+
+  try {
+    return JSON.parse(cleanedJsonText);
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : 'Unknown JSON parse error';
+    throw new Error(`Scenario JSON parse failed: ${reason}`);
+  }
+};
+
+const ensureGeneratedScenarioShape = (scenario: GeneratedScenario, brandName: string): GeneratedScenario => {
+  if (!scenario.headline || !scenario.narrative) {
+    throw new Error(`Scenario generate response missing required fields for ${brandName}`);
+  }
+
+  return scenario;
 };
 
 export const parseScenarioGenerateResponse = (jsonText: string, brandName: string): GeneratedScenario => {
   const parsed = parseJsonText(jsonText);
-  return sanitizeGeneratedScenario(parsed, brandName);
+  return ensureGeneratedScenarioShape(sanitizeGeneratedScenario(parsed, brandName), brandName);
 };
 
 export const parseScenarioEvaluateResponse = (jsonText: string, baselineAnalysis: CBBEData, strategyActions: StrategyAction[]): ScenarioEvaluation => {
