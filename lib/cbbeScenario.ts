@@ -249,9 +249,9 @@ export const sanitizeUserPrediction = (value: unknown): UserPrediction | null =>
   const greatestRisk = cleanText(value.greatestRisk, 300);
   const greatestOpportunity = cleanText(value.greatestOpportunity, 300);
   const likelyStable = cleanText(value.likelyStable, 300);
-  const overallReasoning = cleanText(value.overallReasoning, 700);
+  const overallReasoning = cleanText(value.overallReasoning, 320);
   const selectedManagementDecision = cleanText(value.selectedManagementDecision, 220);
-  const managementResponseDetails = cleanText(value.managementResponseDetails, 400);
+  const managementResponseDetails = cleanText(value.managementResponseDetails, 240);
 
   if (!selectedManagementDecision) {
     return null;
@@ -467,7 +467,6 @@ export const buildScenarioEvaluatePrompt = (
     "feelings": { "score": number, "direction": "decrease" | "no_material_change" | "increase", "reasoning": string, "confidence": "low" | "medium" | "high", "strategicImplication": string },
     "resonance": { "score": number, "direction": "decrease" | "no_material_change" | "increase", "reasoning": string, "confidence": "low" | "medium" | "high", "strategicImplication": string }
   },
-  "actionCritiques": [{ "critique": string }],
   "suggestedStrategyRevisions": string[],
   "evidenceNeeded": string[],
   "limitations": string[]
@@ -482,7 +481,7 @@ Instructions:
 - Avoid invented facts, sources, and market claims.
 - Preserve uncertainty when the effect cannot be determined confidently.
 - Use the same 1-100 scale as the baseline.
-- Do not silently replace the user's strategy; critique it and suggest revisions.
+- Do not silently replace the user's response; critique it and suggest revisions.
 
 Brand: ${brandName}
 Scenario type: ${scenarioInput.scenarioType === 'custom_scenario' ? scenarioInput.customScenarioLabel || 'custom scenario' : scenarioInput.scenarioType.replaceAll('_', ' ')}
@@ -514,8 +513,8 @@ Greatest opportunity: ${userPrediction.greatestOpportunity || 'Not provided.'}
 Likely stable: ${userPrediction.likelyStable || 'Not provided.'}
 Overall reasoning: ${userPrediction.overallReasoning || 'Not provided.'}
 
-Proposed strategic actions:
-${strategyText}`;
+${strategyText ? `Proposed strategic actions:
+${strategyText}` : 'There are no separate strategic actions in this flow. Evaluate the selected management response and the predicted score changes directly.'}`;
 };
 
 export const buildScenarioError = (status: number, error: string) => ({ status, error });

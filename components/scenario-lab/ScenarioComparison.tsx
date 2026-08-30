@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import type { CBBEData, CBBEDimensionKey, GeneratedScenario, ScenarioEvaluation, StrategyRevision, UserPrediction } from '../../types';
+import type { CBBEData, CBBEDimensionKey, GeneratedScenario, ScenarioEvaluation, UserPrediction } from '../../types';
 import CritiqueCard from './CritiqueCard';
 import RadarScoreChart from '../RadarScoreChart';
+import FormattedText from '../FormattedText';
 
 const DIMENSIONS: { key: CBBEDimensionKey; label: string }[] = [
   { key: 'salience', label: 'Salience' },
@@ -17,10 +18,7 @@ interface ScenarioComparisonProps {
   scenario: GeneratedScenario;
   userPrediction: UserPrediction;
   evaluation: ScenarioEvaluation;
-  revisedStrategy: StrategyRevision[];
-  finalizedRevisions: StrategyRevision[];
-  onRevisionStatusChange: (revisionId: string, status: StrategyRevision['status']) => void;
-  onRevisionEdit: (revisionId: string, text: string) => void;
+  revisedStrategy: { id: string; text: string }[];
 }
 
 const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
@@ -28,36 +26,80 @@ const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
   scenario,
   userPrediction,
   evaluation,
-  revisedStrategy,
-  finalizedRevisions,
-  onRevisionStatusChange,
-  onRevisionEdit
+  revisedStrategy
 }) => {
   const [expandedDimension, setExpandedDimension] = useState<CBBEDimensionKey | null>('salience');
+  const dimensionDifferences = DIMENSIONS.map(({ key }) => {
+    const userScore = userPrediction.dimensions[key].predictedScore;
+    const aiScore = evaluation.dimensions[key].score;
+    return typeof userScore === 'number' ? Math.abs(userScore - aiScore) : 100;
+  });
+  const totalDifference = dimensionDifferences.reduce((sum, value) => sum + value, 0);
+  const averageDifference = totalDifference / DIMENSIONS.length;
+  const accuracyScore = Math.max(0, 100 - Math.round(averageDifference));
 
   return (
     <div className="brand-subtle-card brand-card-pad brand-scenario-panel" style={{ '--scenario-panel-color': 'var(--accent-5)' } as React.CSSProperties}>
-      <p className="brand-microcopy brand-scenario-step-label">Steps 5 and 6</p>
-      <h4 className="brand-heading" style={{ fontSize: '1.4rem' }}>Compare results</h4>
+      <p className="brand-microcopy brand-scenario-step-label">Step 4</p>
+      <h4 className="brand-heading" style={{ fontSize: '1.4rem' }}>Scenario results dashboard</h4>
 
       <div className="brand-stack-16">
         <div className="brand-subtle-card brand-card-pad brand-no-top-stripe">
           <p className="brand-field-label">Scenario summary</p>
-          <p className="brand-copy-sm">{evaluation.scenarioSummary}</p>
+          <p className="brand-copy-sm"><FormattedText text={evaluation.scenarioSummary} /></p>
         </div>
 
         <div className="brand-subtle-card brand-card-pad brand-no-top-stripe">
           <p className="brand-field-label">Management response tested</p>
-          <p className="brand-copy-sm brand-scenario-response-context">{userPrediction.selectedManagementDecision}</p>
+          <p className="brand-copy-sm brand-scenario-response-context"><FormattedText text={userPrediction.selectedManagementDecision} /></p>
           {userPrediction.managementResponseDetails ? (
-            <p className="brand-copy-sm" style={{ marginTop: '10px' }}>{userPrediction.managementResponseDetails}</p>
+            <p className="brand-copy-sm" style={{ marginTop: '10px' }}><FormattedText text={userPrediction.managementResponseDetails} /></p>
           ) : null}
         </div>
 
         <div className="brand-subtle-card brand-card-pad brand-no-top-stripe">
-          <p className="brand-field-label">Baseline, prediction, and AI estimate</p>
+          <p className="brand-field-label">Updated score dashboard</p>
           <div className="h-80 md:h-96" style={{ marginTop: '12px' }}>
             <RadarScoreChart data={baselineAnalysis} userPrediction={userPrediction} scenarioEvaluation={evaluation} />
+          </div>
+        </div>
+
+        <div className="brand-subtle-card brand-card-pad brand-no-top-stripe">
+          <p className="brand-field-label">Prediction accuracy score</p>
+          <p className="brand-heading" style={{ fontSize: '2rem' }}>{accuracyScore}/100</p>
+          <p className="brand-copy-sm" style={{ marginTop: '8px' }}>
+            This is `100 -` the average absolute difference between your predicted scores and the AI-estimated scores across all six CBBE dimensions.
+          </p>
+          <div style={{ overflowX: 'auto', marginTop: '14px' }}>
+            <table className="brand-scenario-score-table">
+              <thead>
+                <tr>
+                  <th>Dimension</th>
+                  <th>Original</th>
+                  <th>Your prediction</th>
+                  <th>AI prediction</th>
+                  <th>Difference</th>
+                </tr>
+              </thead>
+              <tbody>
+                {DIMENSIONS.map(({ key, label }) => {
+                  const baselineScore = baselineAnalysis[key].score;
+                  const userScore = userPrediction.dimensions[key].predictedScore;
+                  const aiScore = evaluation.dimensions[key].score;
+                  const difference = typeof userScore === 'number' ? aiScore - userScore : aiScore;
+
+                  return (
+                    <tr key={`accuracy-${key}`}>
+                      <td>{label}</td>
+                      <td>{baselineScore}</td>
+                      <td>{userScore}</td>
+                      <td>{aiScore}</td>
+                      <td>{difference >= 0 ? `+${difference}` : difference}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -84,25 +126,25 @@ const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
                   <span className="brand-scenario-score-chip">Change: {aiScore - baselineScore >= 0 ? '+' : ''}{aiScore - baselineScore}</span>
                   <span className="brand-scenario-score-chip">Confidence: {evaluation.dimensions[key].confidence}</span>
                 </div>
-                <p className="brand-copy-sm">{evaluation.dimensions[key].reasoning}</p>
+                <p className="brand-copy-sm"><FormattedText text={evaluation.dimensions[key].reasoning} /></p>
 
                 {isExpanded && (
                   <div className="brand-stack-12" style={{ marginTop: '16px' }}>
                     <div>
                       <p className="brand-field-label">Original analysis</p>
-                      <p className="brand-copy-sm">{baselineAnalysis[key].analysis}</p>
+                      <p className="brand-copy-sm"><FormattedText text={baselineAnalysis[key].analysis} /></p>
                     </div>
                     <div>
-                      <p className="brand-field-label">User prediction and reasoning</p>
-                      <p className="brand-copy-sm">{userPrediction.dimensions[key].direction.replaceAll('_', ' ')} to {userPrediction.dimensions[key].predictedScore}.</p>
+                      <p className="brand-field-label">Your prediction</p>
+                      <p className="brand-copy-sm">Your predicted direction of {userPrediction.dimensions[key].direction.replaceAll('_', ' ')} to {userPrediction.dimensions[key].predictedScore}.</p>
                     </div>
                     <div>
                       <p className="brand-field-label">AI stress test</p>
-                      <p className="brand-copy-sm">{evaluation.dimensions[key].reasoning}</p>
+                      <p className="brand-copy-sm"><FormattedText text={evaluation.dimensions[key].reasoning} /></p>
                     </div>
                     <div>
                       <p className="brand-field-label">Strategic implication</p>
-                      <p className="brand-copy-sm">{evaluation.dimensions[key].strategicImplication}</p>
+                      <p className="brand-copy-sm"><FormattedText text={evaluation.dimensions[key].strategicImplication} /></p>
                     </div>
                   </div>
                 )}
@@ -115,50 +157,25 @@ const ScenarioComparison: React.FC<ScenarioComparisonProps> = ({
           <CritiqueCard title="Well supported" items={evaluation.strongReasoning} />
           <CritiqueCard title="Questionable assumptions" items={evaluation.questionableAssumptions} />
           <CritiqueCard title="Missing considerations" items={evaluation.missingConsiderations} />
-          <CritiqueCard title="Recommended revisions" items={evaluation.suggestedStrategyRevisions.map((revision) => revision.text)} />
         </div>
 
         {userPrediction.overallReasoning ? (
           <div className="brand-subtle-card brand-card-pad brand-no-top-stripe">
             <p className="brand-field-label">Your reasoning note</p>
-            <p className="brand-copy-sm">{userPrediction.overallReasoning}</p>
+            <p className="brand-copy-sm"><FormattedText text={userPrediction.overallReasoning} /></p>
           </div>
         ) : null}
 
         <div className="brand-subtle-card brand-card-pad brand-no-top-stripe">
           <p className="brand-field-label">Recommended revisions</p>
-          <div className="brand-stack-16" style={{ marginTop: '12px' }}>
+          <ul className="brand-ref-list" style={{ marginTop: '12px' }}>
             {revisedStrategy.map((revision) => (
-              <div key={revision.id} className="brand-subtle-card brand-card-pad brand-no-top-stripe">
-                <textarea
-                  className="brand-input brand-scenario-textarea"
-                  value={revision.text}
-                  onChange={(event) => onRevisionEdit(revision.id, event.target.value)}
-                />
-                <div className="brand-scenario-actions-row brand-scenario-actions-wrap">
-                  <button type="button" className="brand-button-light" onClick={() => onRevisionStatusChange(revision.id, 'accepted')}>Accept</button>
-                  <button type="button" className="brand-button-light" onClick={() => onRevisionStatusChange(revision.id, 'rejected')}>Reject</button>
-                  <span className="brand-copy-sm">Current status: {revision.status}</span>
-                </div>
-              </div>
+              <li key={revision.id} className="brand-ref-item">
+                <div className="brand-ref-dot"></div>
+                <p className="brand-copy-sm"><FormattedText text={revision.text} /></p>
+              </li>
             ))}
-          </div>
-        </div>
-
-        <div className="brand-subtle-card brand-card-pad brand-no-top-stripe">
-          <p className="brand-field-label">Final revised strategy</p>
-          {finalizedRevisions.length > 0 ? (
-            <ul className="brand-ref-list" style={{ marginTop: '12px' }}>
-              {finalizedRevisions.map((revision) => (
-                <li key={revision.id} className="brand-ref-item">
-                  <div className="brand-ref-dot"></div>
-                  <p className="brand-copy-sm">{revision.text}</p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="brand-copy-sm" style={{ marginTop: '12px' }}>No revisions accepted yet.</p>
-          )}
+          </ul>
         </div>
       </div>
     </div>

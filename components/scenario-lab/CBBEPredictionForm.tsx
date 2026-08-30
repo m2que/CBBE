@@ -78,7 +78,7 @@ const CBBEPredictionForm: React.FC<CBBEPredictionFormProps> = ({ baselineAnalysi
       <p className="brand-microcopy brand-scenario-step-label">Step 3</p>
       <h4 className="brand-heading" style={{ fontSize: '1.4rem' }}>Predict the impact</h4>
       <p className="brand-copy-sm" style={{ marginTop: '8px' }}>
-        Move each CBBE dimension up or down based on the selected response. Baseline scores stay visible for reference.
+        Set the predicted CBBE scores after management takes this response. Baseline scores stay visible for reference.
       </p>
       <div className="brand-subtle-card brand-card-pad brand-no-top-stripe" style={{ marginTop: '14px' }}>
         <p className="brand-field-label">Management response being tested</p>
@@ -134,22 +134,24 @@ const CBBEPredictionForm: React.FC<CBBEPredictionFormProps> = ({ baselineAnalysi
 
       <div className="brand-scenario-form-grid">
         <label className="brand-field brand-scenario-form-span-full">
-          <span className="brand-field-label">Optional reasoning</span>
+          <span className="brand-field-label">Explain your reasoning</span>
+          <span className="brand-help">Adding more detail improves the quality of the resulting critique and scenario comparison.</span>
           <textarea
             className="brand-input brand-scenario-textarea"
             disabled={isSubmitted}
-            maxLength={400}
+            maxLength={320}
+            placeholder="Explain the key assumptions behind the six score changes."
             value={formState.overallReasoning}
-            onChange={(event) => setFormState((current) => ({ ...current, overallReasoning: event.target.value.slice(0, 400) }))}
+            onChange={(event) => setFormState((current) => ({ ...current, overallReasoning: event.target.value.slice(0, 320) }))}
           />
-          <span className="brand-help">Use one note to explain the key assumptions behind the six score changes.</span>
+          <span className="brand-help">{formState.overallReasoning.length}/320</span>
         </label>
       </div>
 
       {error ? <p className="brand-error-text">{error}</p> : null}
       {!isSubmitted && (
         <div className="brand-scenario-actions-row">
-          <button type="button" className="brand-button-light" onClick={handleSubmit}>Continue to strategy</button>
+          <button type="button" className="brand-button-light brand-scenario-primary-action" onClick={handleSubmit}>Continue to results</button>
         </div>
       )}
     </div>

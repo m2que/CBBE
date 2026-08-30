@@ -1,4 +1,5 @@
 import React from 'react';
+import FormattedText from '../FormattedText';
 
 interface CritiqueCardProps {
   title: string;
@@ -13,7 +14,7 @@ const CritiqueCard: React.FC<CritiqueCardProps> = ({ title, items }) => {
         {items.map((item) => (
           <li key={item} className="brand-ref-item">
             <div className="brand-ref-dot"></div>
-            <p className="brand-copy-sm">{item}</p>
+            <p className="brand-copy-sm"><FormattedText text={item} /></p>
           </li>
         ))}
       </ul>

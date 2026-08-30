@@ -55,9 +55,9 @@ const StrategyActionsForm: React.FC<StrategyActionsFormProps> = ({ initialValue,
   return (
     <div className="brand-subtle-card brand-card-pad brand-scenario-panel" style={{ '--scenario-panel-color': 'var(--accent-3)' } as React.CSSProperties}>
       <p className="brand-microcopy brand-scenario-step-label">Step 4</p>
-      <h4 className="brand-heading" style={{ fontSize: '1.4rem' }}>Amend the strategy</h4>
+      <h4 className="brand-heading" style={{ fontSize: '1.4rem' }}>Define supporting actions</h4>
       <p className="brand-copy-sm" style={{ marginTop: '8px' }}>
-        Propose one to three strategic actions before the AI critique. The tool does not generate the student strategy automatically at this stage.
+        Turn the selected management response into one to three concrete execution actions before viewing the AI critique.
       </p>
 
       <div className="brand-stack-16">

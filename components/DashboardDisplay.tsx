@@ -5,6 +5,7 @@ import CategoryCard from './CategoryCard';
 import BrandEquityFunnel from './BrandEquityFunnel';
 import RadarScoreChart from './RadarScoreChart';
 import BrandIcon from './BrandIcon';
+import FormattedText from './FormattedText';
 import ScenarioLab from './scenario-lab/ScenarioLab';
 
 interface DashboardDisplayProps {
@@ -93,10 +94,10 @@ const DashboardDisplay: React.FC<DashboardDisplayProps> = ({ data, onRunNewAnaly
         </div>
         <div className="brand-card brand-card-pad brand-card-stripe-forest">
             <div className="brand-section-title">
-                <BrandIcon name="icon-bpm" style={{ color: 'var(--accent-2)' }} />
+                <BrandIcon name="icon-marketlearn" style={{ color: 'var(--accent-2)' }} />
                 <h3 className="brand-heading">Strategic Recommendations</h3>
             </div>
-            <p className="brand-copy">{data.summary.strategicRecommendations}</p>
+            <p className="brand-copy"><FormattedText text={data.summary.strategicRecommendations} /></p>
         </div>
       </div>
 

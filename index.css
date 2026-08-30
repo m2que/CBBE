@@ -267,7 +267,7 @@ body {
 
 .brand-scenario-steps {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -293,6 +293,7 @@ body {
 .brand-scenario-step {
   display: grid;
   gap: 8px;
+  min-height: 100%;
   padding: 14px;
   border: 1px solid var(--line);
   background: var(--surface-subtle);
@@ -445,6 +446,25 @@ body {
   margin-top: 6px;
   color: var(--muted);
   font-size: 0.82rem;
+}
+
+.brand-scenario-score-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.brand-scenario-score-table th,
+.brand-scenario-score-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.brand-scenario-score-table th {
+  color: var(--muted-strong);
+  font-weight: 700;
 }
 
 .brand-scenario-response-option-selected {

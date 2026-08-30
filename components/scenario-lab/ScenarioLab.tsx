@@ -4,21 +4,18 @@ import type {
   GeneratedScenario,
   ScenarioInput,
   ScenarioSession,
-  StrategyAction,
-  StrategyRevision,
   UserPrediction
 } from '../../types';
 import { evaluateScenario, generateScenario } from '../../services/geminiService';
 import ErrorDisplay from '../ErrorDisplay';
 import LoadingIndicator from '../LoadingIndicator';
-import { sanitizeGeneratedScenario, syncAcceptedRevisions } from '../../lib/cbbeScenario';
+import { sanitizeGeneratedScenario } from '../../lib/cbbeScenario';
 import ScenarioSelector from './ScenarioSelector';
 import ScenarioEditor from './ScenarioEditor';
 import CBBEPredictionForm from './CBBEPredictionForm';
-import StrategyActionsForm from './StrategyActionsForm';
 import ScenarioComparison from './ScenarioComparison';
 
-const STORAGE_VERSION = 'v2';
+const STORAGE_VERSION = 'v3';
 
 const defaultScenarioInput: ScenarioInput = {
   scenarioType: 'product_or_service_failure',
@@ -45,10 +42,6 @@ const createDefaultPrediction = (): UserPrediction => ({
   overallReasoning: ''
 });
 
-const createDefaultActions = (): StrategyAction[] => [
-  { id: 'action-1', action: '', reason: '', expectedEffect: '', riskTradeOff: '' }
-];
-
 const buildSessionId = (): string => {
   return `scenario-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 };
@@ -59,9 +52,8 @@ const buildStorageKey = (brandName: string, sessionId: string): string => {
 };
 
 const getStartingStep = (session: ScenarioSession): number => {
-  if (session.scenarioEvaluation) return 6;
-  if (session.strategyActions?.length) return 5;
-  if (session.userPrediction) return 4;
+  if (session.scenarioEvaluation) return 4;
+  if (session.userPrediction) return 3;
   if (session.generatedScenario) return 3;
   return 1;
 };
@@ -117,6 +109,7 @@ const loadStoredSession = (baselineAnalysis: CBBEData): ScenarioSession | null =
       baselineAnalysis,
       generatedScenario: normalizedGeneratedScenario,
       userPrediction: normalizedUserPrediction,
+      strategyActions: undefined,
       finalRevisedStrategy: parsed.session.finalRevisedStrategy || []
     };
   } catch {
@@ -142,14 +135,14 @@ const ScenarioLab: React.FC<ScenarioLabProps> = ({ baselineAnalysis }) => {
   }));
   const [isGeneratingScenario, setIsGeneratingScenario] = useState<boolean>(false);
   const [isEvaluatingScenario, setIsEvaluatingScenario] = useState<boolean>(false);
+  const [evaluationStartedAt, setEvaluationStartedAt] = useState<number>(0);
+  const [evaluationElapsedSeconds, setEvaluationElapsedSeconds] = useState<number>(0);
   const [scenarioError, setScenarioError] = useState<string | null>(null);
 
   const stepLabels = useMemo(() => [
     'Choose scenario',
     'Review and customize event',
     'Predict the impact',
-    'Amend the strategy',
-    'Run AI stress test',
     'Compare results'
   ], []);
 
@@ -157,8 +150,6 @@ const ScenarioLab: React.FC<ScenarioLabProps> = ({ baselineAnalysis }) => {
     'var(--accent)',
     'var(--accent-2)',
     'var(--accent-4)',
-    'var(--accent-3)',
-    'var(--accent-5)',
     'var(--accent-6)'
   ], []);
 
@@ -176,6 +167,21 @@ const ScenarioLab: React.FC<ScenarioLabProps> = ({ baselineAnalysis }) => {
       // Ignore storage write failures for MVP resilience.
     }
   }, [baselineAnalysis.brandName, session]);
+
+  useEffect(() => {
+    if (!isEvaluatingScenario || !evaluationStartedAt) {
+      setEvaluationElapsedSeconds(0);
+      return;
+    }
+
+    setEvaluationElapsedSeconds(Math.max(1, Math.floor((Date.now() - evaluationStartedAt) / 1000)));
+
+    const timer = window.setInterval(() => {
+      setEvaluationElapsedSeconds(Math.max(1, Math.floor((Date.now() - evaluationStartedAt) / 1000)));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [evaluationStartedAt, isEvaluatingScenario]);
 
   const handleCreateScenario = async (scenarioInput: ScenarioInput) => {
     setIsGeneratingScenario(true);
@@ -237,26 +243,19 @@ const ScenarioLab: React.FC<ScenarioLabProps> = ({ baselineAnalysis }) => {
     setSession((current) => ({
       ...current,
       userPrediction,
-      strategyActions: current.strategyActions || createDefaultActions(),
       scenarioEvaluation: undefined,
       finalRevisedStrategy: current.finalRevisedStrategy || []
     }));
     setCurrentStep(4);
+    void handleRunStressTest(userPrediction);
   };
 
-  const handleStrategySubmit = (strategyActions: StrategyAction[]) => {
-    setSession((current) => ({
-      ...current,
-      strategyActions,
-      scenarioEvaluation: undefined
-    }));
-    setCurrentStep(5);
-  };
-
-  const handleRunStressTest = async () => {
-    if (!session.generatedScenario || !session.userPrediction || !session.strategyActions) return;
+  const handleRunStressTest = async (predictionOverride?: UserPrediction) => {
+    const prediction = predictionOverride || session.userPrediction;
+    if (!session.generatedScenario || !prediction) return;
 
     setIsEvaluatingScenario(true);
+    setEvaluationStartedAt(Date.now());
     setScenarioError(null);
 
     try {
@@ -265,41 +264,23 @@ const ScenarioLab: React.FC<ScenarioLabProps> = ({ baselineAnalysis }) => {
         baselineAnalysis,
         session.scenarioInput,
         session.generatedScenario,
-        session.userPrediction,
-        session.strategyActions
+        prediction,
+        []
       );
 
       setSession((current) => ({
         ...current,
+        userPrediction: prediction,
         scenarioEvaluation,
         finalRevisedStrategy: current.finalRevisedStrategy?.length ? current.finalRevisedStrategy : scenarioEvaluation.suggestedStrategyRevisions
       }));
-      setCurrentStep(6);
+      setCurrentStep(4);
     } catch {
       setScenarioError('We could not complete the AI stress test right now. Please try again.');
     } finally {
       setIsEvaluatingScenario(false);
+      setEvaluationStartedAt(0);
     }
-  };
-
-  const handleRevisionStatusChange = (revisionId: string, status: StrategyRevision['status']) => {
-    setSession((current) => {
-      const revisions = (current.finalRevisedStrategy || []).map((revision) => revision.id === revisionId ? { ...revision, status } : revision);
-      return {
-        ...current,
-        finalRevisedStrategy: revisions
-      };
-    });
-  };
-
-  const handleRevisionEdit = (revisionId: string, text: string) => {
-    setSession((current) => {
-      const revisions = (current.finalRevisedStrategy || []).map((revision) => revision.id === revisionId ? { ...revision, text, status: 'edited' } : revision);
-      return {
-        ...current,
-        finalRevisedStrategy: revisions
-      };
-    });
   };
 
   const handleResetScenario = () => {
@@ -316,8 +297,6 @@ const ScenarioLab: React.FC<ScenarioLabProps> = ({ baselineAnalysis }) => {
     setCurrentStep(1);
     setScenarioError(null);
   };
-
-  const finalizedRevisions = syncAcceptedRevisions(session.finalRevisedStrategy || []);
 
   return (
     <section className="brand-card brand-card-pad brand-scenario-lab" aria-labelledby="scenario-lab-title">
@@ -354,8 +333,6 @@ const ScenarioLab: React.FC<ScenarioLabProps> = ({ baselineAnalysis }) => {
           );
         })}
       </div>
-
-      {scenarioError ? <ErrorDisplay message={scenarioError} /> : null}
 
       {currentStep === 1 && (
         <ScenarioSelector
@@ -398,35 +375,12 @@ const ScenarioLab: React.FC<ScenarioLabProps> = ({ baselineAnalysis }) => {
         />
       )}
 
-      {session.strategyActions && currentStep >= 4 && session.userPrediction && (
-        <StrategyActionsForm
-          initialValue={session.strategyActions}
-          onSubmit={handleStrategySubmit}
-          isSubmitted={currentStep > 4}
-        />
-      )}
-
-      {currentStep >= 5 && session.userPrediction && session.strategyActions && !session.scenarioEvaluation && (
-        <div className="brand-subtle-card brand-card-pad brand-scenario-panel" style={{ '--scenario-panel-color': 'var(--accent-5)' } as React.CSSProperties}>
-          <p className="brand-microcopy brand-scenario-step-label">Step 5</p>
-          <h4 className="brand-heading" style={{ fontSize: '1.4rem' }}>Ready to critique your response</h4>
-          <p className="brand-copy-sm">
-            Run the AI stress test to compare your prediction with an evidence-aware estimate built from the original baseline analysis.
-          </p>
-          <div className="brand-scenario-actions-row">
-            <button type="button" className="brand-button-light" onClick={handleRunStressTest} disabled={isEvaluatingScenario}>
-              {isEvaluatingScenario ? 'Running stress test...' : 'Run AI stress test'}
-            </button>
-          </div>
-        </div>
-      )}
-
       {isEvaluatingScenario && (
         <LoadingIndicator
-          elapsedSeconds={0}
-          title="Running AI stress test..."
-          description="Comparing your prediction with an evidence-aware scenario estimate."
-          note="This step critiques the reasoning and estimates effects across the six CBBE dimensions."
+          elapsedSeconds={evaluationElapsedSeconds}
+          title="Rerunning analysis..."
+          description="Generating an updated scenario dashboard from the selected management response and your predicted score changes."
+          note="This creates a new results view with AI-estimated CBBE effects across the six dimensions."
         />
       )}
 
@@ -437,11 +391,11 @@ const ScenarioLab: React.FC<ScenarioLabProps> = ({ baselineAnalysis }) => {
           userPrediction={session.userPrediction}
           evaluation={session.scenarioEvaluation}
           revisedStrategy={session.finalRevisedStrategy || []}
-          finalizedRevisions={finalizedRevisions}
-          onRevisionStatusChange={handleRevisionStatusChange}
-          onRevisionEdit={handleRevisionEdit}
         />
       )}
+
+      {scenarioError && currentStep >= 4 ? <ErrorDisplay message={scenarioError} /> : null}
+      {scenarioError && currentStep < 4 ? <ErrorDisplay message={scenarioError} /> : null}
     </section>
   );
 };

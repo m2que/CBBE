@@ -104,11 +104,11 @@ const ScenarioEditor: React.FC<ScenarioEditorProps> = ({
             <textarea
               className="brand-input brand-scenario-textarea"
               value={managementResponseDetails}
-              maxLength={260}
+              maxLength={240}
               placeholder="Example: Explain timing, communication steps, operational actions, and the trade-offs management is accepting."
-              onChange={(event) => onManagementResponseDetailsChange(event.target.value.slice(0, 260))}
+              onChange={(event) => onManagementResponseDetailsChange(event.target.value.slice(0, 240))}
             />
-            <span className="brand-help">{managementResponseDetails.length}/260</span>
+            <span className="brand-help">{managementResponseDetails.length}/240</span>
           </label>
         </div>
       </div>

@@ -138,7 +138,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const normalizedGeneratedScenario = sanitizeGeneratedScenario(generatedScenario, normalizedBrandName);
     const normalizedUserPrediction = sanitizeUserPrediction(userPrediction);
-    const normalizedStrategyActions = sanitizeStrategyActions(strategyActions);
+    const normalizedStrategyActions = Array.isArray(strategyActions) && strategyActions.length === 0
+      ? []
+      : sanitizeStrategyActions(strategyActions);
 
     if (!normalizedUserPrediction) {
       return sendValidationError(res, 'User prediction is invalid or incomplete.');
