@@ -34,3 +34,17 @@ View your app in AI Studio: https://ai.studio/apps/drive/1K8-2FskAChYNN45UOYwgnP
 - Reuse the shared MarketLearn icon system rather than creating one-off icons. In this repo, the local self-contained icon sprite lives in `components/BrandIconSprite.tsx` and the icon wrapper lives in `components/BrandIcon.tsx`.
 - The current local brand base is in `assets/brand.css`, with app-specific overrides in `index.css`.
 - Keep CBBE application logic, `/api/cbbe`, `/api/cbbe-scenario`, baseline report flow, and chart/output logic unchanged unless the task explicitly calls for product behavior changes.
+
+## Next Session Priority
+
+- The next major priority is the backend database layer.
+- Start by inspecting whether the repo already has any persistence, auth, ORM, or database configuration.
+- If there is no existing database setup, propose the smallest production-safe persistence plan first before implementation.
+- Likely persistence targets:
+  - saved baseline CBBE analyses
+  - Scenario Lab sessions and results
+  - rerun/comparison history for class use
+  - timestamps, model metadata, and basic audit fields
+- Keep the current `/api/cbbe` and `/api/cbbe-scenario` contracts stable unless a schema-backed extension is explicitly needed.
+- Keep Gemini calls server-side.
+- Prefer small, reviewable changes and document any schema decisions clearly.
