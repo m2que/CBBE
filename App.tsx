@@ -8,6 +8,7 @@ import LoadingIndicator from './components/LoadingIndicator';
 import ErrorDisplay from './components/ErrorDisplay';
 import BrandIcon from './components/BrandIcon';
 import BrandIconSprite from './components/BrandIconSprite';
+import { track } from './lib/analytics';
 
 const App: React.FC = () => {
   const [brand, setBrand] = useState<string>('');
@@ -46,6 +47,7 @@ const App: React.FC = () => {
       setError('Please enter a brand name.');
       return;
     }
+    track('analyze_click', { app_name: 'cbbe' });
     setIsLoading(true);
     setError(null);
     setDashboardData(null);
@@ -61,6 +63,7 @@ const App: React.FC = () => {
         ...data,
         marketOverview: overview || data.marketOverview
       });
+      track('analyze_success', { app_name: 'cbbe', model: selectedModel });
     } catch (err) {
       console.error(err);
       setError('Failed to generate dashboard. The brand may not be well-known enough, or an API error occurred. Please try again.');
